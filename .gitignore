@@ -125,3 +125,5 @@ distribution.cer
 
 # Release note previews
 CHANGELOG.preview.md
+
+crates/*/target/
