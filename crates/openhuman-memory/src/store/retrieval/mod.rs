@@ -34,7 +34,7 @@ use crate::store::chunks::store::list_chunks;
 use crate::store::chunks::types::{Chunk, SourceKind};
 use crate::store::types::NamespaceMemoryHit;
 use crate::store::UnifiedMemory;
-use crate::openhuman::memory_tree::retrieval::types::RetrievalHit;
+use crate::tree::retrieval::types::RetrievalHit;
 
 /// Optional filter set for `param_tag_search`. All `Some` fields are AND-ed
 /// together; `None` fields are unconstrained.
@@ -77,7 +77,7 @@ impl RetrievalFacade {
         query: Option<&str>,
         limit: Option<usize>,
     ) -> Result<Vec<RetrievalHit>> {
-        crate::openhuman::memory_tree::retrieval::drill_down::drill_down(
+        crate::tree::retrieval::drill_down::drill_down(
             config, node_id, max_depth, query, limit,
         )
         .await

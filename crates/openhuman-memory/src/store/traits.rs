@@ -21,7 +21,7 @@ use std::path::PathBuf;
 use crate::store::chunks::types::Chunk;
 use crate::store::kinds::MemoryKind;
 use crate::store::trees::{SummaryNode, Tree};
-use crate::openhuman::people::types::Person;
+use crate::bridge::people::types::Person;
 
 /// A rendered Obsidian markdown file: where it lives in the vault and what
 /// bytes to write. Vault path is relative to the content-store root.
@@ -267,13 +267,13 @@ mod tests {
     fn person_traits_render_name_and_email_when_present() {
         let now = Utc::now();
         let person = Person {
-            id: crate::openhuman::people::types::PersonId::new(),
+            id: crate::bridge::people::types::PersonId::new(),
             display_name: Some("Alice Example".into()),
             primary_email: Some("alice@example.com".into()),
             primary_phone: Some("+1 555 0100".into()),
             handles: vec![
-                crate::openhuman::people::types::Handle::DisplayName("Alice Example".into()),
-                crate::openhuman::people::types::Handle::Email("alice@example.com".into()),
+                crate::bridge::people::types::Handle::DisplayName("Alice Example".into()),
+                crate::bridge::people::types::Handle::Email("alice@example.com".into()),
             ],
             created_at: now,
             updated_at: now,
@@ -293,7 +293,7 @@ mod tests {
     fn person_traits_fall_back_when_fields_are_missing() {
         let now = Utc::now();
         let person = Person {
-            id: crate::openhuman::people::types::PersonId::new(),
+            id: crate::bridge::people::types::PersonId::new(),
             display_name: None,
             primary_email: None,
             primary_phone: None,

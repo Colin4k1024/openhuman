@@ -17,7 +17,7 @@ use crate::embeddings::{
     self, format_embedding_signature, EmbeddingProvider, DEFAULT_CLOUD_EMBEDDING_DIMENSIONS,
     DEFAULT_CLOUD_EMBEDDING_MODEL, DEFAULT_OLLAMA_DIMENSIONS, DEFAULT_OLLAMA_MODEL,
 };
-use crate::openhuman::memory::traits::Memory;
+use crate::bridge::memory_traits::Memory;
 use crate::store::unified::UnifiedMemory;
 
 /// One-shot guard so the Ollama health-gate fallback only reports to Sentry
@@ -34,7 +34,7 @@ static OLLAMA_HEALTH_REPORTED: AtomicBool = AtomicBool::new(false);
 /// Returns `true` on the firing call, `false` afterwards — callers use the
 /// return value only for logging context.
 ///
-/// [`EmbeddingModelUnhealthy`]: crate::core::event_bus::events::DomainEvent::EmbeddingModelUnhealthy
+/// [`EmbeddingModelUnhealthy`]: crate::bridge::events::MemoryEvent::EmbeddingModelUnhealthy
 fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     if OLLAMA_HEALTH_REPORTED
         .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
@@ -58,7 +58,7 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     // and produced TAURI-RUST-B (~409 events). The `&str` input avoids
     // the `format!("{:#}")` round-trip that `report_error` would do on an
     // anyhow chain — the wire shape stays bit-identical.
-    crate::core::observability::report_error_or_expected(
+    tracing::warn(
         sentry_message.as_str(),
         "memory",
         "ollama_health_gate",
@@ -76,7 +76,7 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     log::debug!(
         "[memory::factory] publishing EmbeddingModelUnhealthy event: provider=ollama model={model} fallback=cloud"
     );
-    let event = crate::core::event_bus::DomainEvent::EmbeddingModelUnhealthy {
+    let event = crate::bridge::events::DomainEvent::EmbeddingModelUnhealthy {
         provider: "ollama".to_string(),
         model: model.to_string(),
         fallback_provider: "cloud".to_string(),
@@ -84,7 +84,7 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     };
     // publish_global is infallible (drops the event when no receivers are
     // registered, which is fine for the health-gate use case).
-    crate::core::event_bus::publish_global(event);
+    crate::bridge::events::publish_global(event);
 
     true
 }
@@ -99,12 +99,12 @@ fn reset_health_gate_for_test() {
 
 /// Effective Ollama base URL.
 ///
-/// Delegates to [`crate::openhuman::inference::local::ollama_base_url`] so the probe
+/// Delegates to [`crate::bridge::inference::local::ollama_base_url`] so the probe
 /// always agrees with the rest of the Ollama machinery on the daemon address.
 /// If a future change adds another env-var override or shifts precedence, the
 /// memory health-gate picks it up automatically.
 fn ollama_base_url_for_probe() -> String {
-    crate::openhuman::inference::local::ollama_base_url()
+    crate::bridge::inference::local::ollama_base_url()
 }
 
 /// Canonical `(provider, model, dimensions)` tuple used everywhere the
@@ -464,7 +464,7 @@ mod tests {
 
     impl EnvGuard {
         fn set(value: &str) -> Self {
-            let lock = crate::openhuman::inference::local::inference_test_guard();
+            let lock = crate::bridge::inference::local::inference_test_guard();
             let prev = std::env::var_os("OPENHUMAN_OLLAMA_BASE_URL");
             // SAFETY: env mutation is wrapped because Rust 2024 marks it
             // unsafe; the call is gated by the local-AI domain mutex so no
@@ -750,7 +750,7 @@ mod tests {
     /// fresh "first", flaking the suppression assertion.
     #[test]
     fn ollama_health_gate_reports_at_most_once_per_process() {
-        let _lock = crate::openhuman::inference::local::inference_test_guard();
+        let _lock = crate::bridge::inference::local::inference_test_guard();
         reset_health_gate_for_test();
 
         assert!(

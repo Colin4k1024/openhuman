@@ -4,7 +4,7 @@ use std::path::Path;
 
 use super::atomic::sha256_hex;
 use super::compose::split_front_matter;
-use crate::openhuman::memory::util::redact::redact;
+use crate::bridge::redact::redact;
 
 /// The result of reading a chunk file from disk.
 pub struct ChunkFileContents {

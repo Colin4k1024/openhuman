@@ -24,10 +24,10 @@
 //! | [`clear_entity_index_for_node`] | `memory_tree::score::store::clear_entity_index_for_node` |
 //! | [`count_entity_index`]      | `memory_tree::score::store::count_entity_index` |
 //!
-//! See [`crate::openhuman::memory_graph`] for the derived co-occurrence
+//! See [`crate::graph`] for the derived co-occurrence
 //! query layer built on top of these primitives.
 
-pub use crate::openhuman::memory_tree::score::store::{
+pub use crate::tree::score::store::{
     clear_entity_index_for_node, count_entity_index, index_entities, index_entity,
     list_entity_ids_for_node, lookup_entity, EntityHit,
 };
@@ -42,7 +42,7 @@ mod tests {
             entity_id: "person:alice".into(),
             node_id: "chunk-1".into(),
             node_kind: "leaf".into(),
-            entity_kind: crate::openhuman::memory_tree::score::extract::EntityKind::Person,
+            entity_kind: crate::tree::score::extract::EntityKind::Person,
             surface: "Alice".into(),
             score: 1.0,
             timestamp_ms: 123,

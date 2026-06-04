@@ -195,7 +195,7 @@ pub fn episodic_search(
 }
 
 /// FTS5 search across **all** sessions, optionally excluding one session
-/// from the result set. Used by [`crate::openhuman::memory`] to surface
+/// from the result set. Used by [`crate`] to surface
 /// cross-chat conversational context for the same user/workspace (issue
 /// #1505) without leaking the current chat's own history into the
 /// "other chats" block.

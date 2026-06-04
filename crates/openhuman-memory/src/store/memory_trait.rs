@@ -14,7 +14,7 @@ use chrono::{TimeZone, Utc};
 use rusqlite::{params, OptionalExtension};
 use serde_json::json;
 
-use crate::openhuman::memory::traits::{
+use crate::bridge::memory_traits::{
     Memory, MemoryCategory, MemoryEntry, MemoryTaint, NamespaceSummary, RecallOpts,
 };
 use crate::store::types::{NamespaceDocumentInput, GLOBAL_NAMESPACE};
@@ -197,7 +197,7 @@ impl Memory for UnifiedMemory {
                     timestamp: ts_rfc3339,
                     session_id: Some(entry.session_id),
                     score: Some(match_score),
-                    taint: crate::openhuman::memory::MemoryTaint::Internal,
+                    taint: crate::bridge::memory_traits::MemoryTaint::Internal,
                 });
             }
         }
@@ -268,7 +268,7 @@ impl Memory for UnifiedMemory {
                     timestamp: ts_rfc3339,
                     session_id: Some(entry.session_id),
                     score: Some(match_score),
-                    taint: crate::openhuman::memory::MemoryTaint::Internal,
+                    taint: crate::bridge::memory_traits::MemoryTaint::Internal,
                 });
             }
         }
@@ -339,7 +339,7 @@ impl Memory for UnifiedMemory {
                 timestamp: timestamp_to_rfc3339(updated_at),
                 session_id: None,
                 score: None,
-                taint: crate::openhuman::memory::MemoryTaint::from_db_str(&taint_str),
+                taint: crate::bridge::memory_traits::MemoryTaint::from_db_str(&taint_str),
             },
         ))
     }
@@ -388,7 +388,7 @@ impl Memory for UnifiedMemory {
                 timestamp: format!("idx-{idx}"),
                 session_id: None,
                 score: None,
-                taint: crate::openhuman::memory::MemoryTaint::from_db_str(taint_str),
+                taint: crate::bridge::memory_traits::MemoryTaint::from_db_str(taint_str),
             });
         }
         Ok(out)

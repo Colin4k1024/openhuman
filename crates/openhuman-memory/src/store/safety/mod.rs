@@ -521,12 +521,12 @@ mod tests {
             category: "core".into(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::ExternalSync,
+            taint: crate::bridge::memory_traits::MemoryTaint::ExternalSync,
         };
         let sanitized = sanitize_document_input(input);
         assert_eq!(
             sanitized.value.taint,
-            crate::openhuman::memory::MemoryTaint::ExternalSync,
+            crate::bridge::memory_traits::MemoryTaint::ExternalSync,
             "taint must survive sanitization unchanged"
         );
         assert!(sanitized.report.text_redactions >= 1);

@@ -26,7 +26,7 @@ fn make_doc_input(
         category: "core".to_string(),
         session_id: None,
         document_id: None,
-        taint: crate::openhuman::memory::MemoryTaint::Internal,
+        taint: crate::bridge::memory_traits::MemoryTaint::Internal,
     }
 }
 
@@ -940,7 +940,7 @@ async fn upsert_document_redacts_secret_like_content_before_persisting() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .unwrap();
@@ -1050,7 +1050,7 @@ async fn upsert_document_rejects_secret_like_key() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("secret-like key should be rejected");
@@ -1075,7 +1075,7 @@ async fn upsert_document_rejects_secret_like_namespace() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("secret-like namespace should be rejected");
@@ -1100,7 +1100,7 @@ async fn upsert_document_metadata_only_rejects_secret_like_key() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("secret-like key should be rejected");
@@ -1180,7 +1180,7 @@ async fn upsert_document_rejects_pii_like_key() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("PII-like key should be rejected");
@@ -1208,7 +1208,7 @@ async fn upsert_document_rejects_pii_like_namespace() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("PII-like namespace should be rejected");
@@ -1236,7 +1236,7 @@ async fn upsert_document_metadata_only_rejects_pii_like_key() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("PII-like key should be rejected");
@@ -1264,7 +1264,7 @@ async fn upsert_document_metadata_only_rejects_pii_like_namespace() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .expect_err("PII-like namespace should be rejected");

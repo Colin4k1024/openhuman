@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::openhuman::memory::MemoryTaint;
+use crate::bridge::memory_traits::MemoryTaint;
 
 pub(crate) const GLOBAL_NAMESPACE: &str = "global";
 
@@ -51,7 +51,7 @@ pub struct NamespaceQueryResult {
     /// Stored category string (e.g. `core`, `daily`, or custom label).
     pub category: String,
     /// Provenance taint carried back from the persistence layer so the
-    /// recall caller can surface it on [`crate::openhuman::memory::MemoryEntry`].
+    /// recall caller can surface it on [`crate::bridge::memory_traits::MemoryEntry`].
     /// Defaults to [`MemoryTaint::Internal`] for legacy rows that predate
     /// the column.
     #[serde(default)]

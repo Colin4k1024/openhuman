@@ -11,7 +11,7 @@ use serde_json::json;
 use crate::config::rpc as config_rpc;
 use crate::store::chunks::store::{list_chunks, ListChunksQuery};
 use crate::store::chunks::types::SourceKind;
-use crate::openhuman::tools::traits::{Tool, ToolResult};
+use crate::tools::traits::{Tool, ToolResult};
 
 pub struct MemoryStoreRawChunksTool;
 
@@ -122,7 +122,7 @@ impl Tool for MemoryStoreRawChunksTool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openhuman::tools::traits::Tool;
+    use crate::tools::traits::Tool;
     use serde_json::json;
 
     #[test]

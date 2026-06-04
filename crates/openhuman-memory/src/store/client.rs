@@ -12,8 +12,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::embeddings::{self, EmbeddingProvider};
-use crate::openhuman::memory::ingestion::queue as ingestion_queue;
-use crate::openhuman::memory::ingestion::{
+use crate::bridge::memory_traits::ingestion::queue as ingestion_queue;
+use crate::bridge::memory_traits::ingestion::{
     IngestionJob, IngestionQueue, IngestionState, MemoryIngestionConfig, MemoryIngestionRequest,
     MemoryIngestionResult,
 };
@@ -72,8 +72,8 @@ impl MemoryClient {
     /// want to build on top of the `Memory` trait (e.g. the
     /// tool-scoped memory layer) without depending on the concrete
     /// `MemoryClient` type or holding a reference to it.
-    pub fn memory_handle(&self) -> Arc<dyn crate::openhuman::memory::Memory> {
-        Arc::clone(&self.inner) as Arc<dyn crate::openhuman::memory::Memory>
+    pub fn memory_handle(&self) -> Arc<dyn crate::bridge::memory_traits::Memory> {
+        Arc::clone(&self.inner) as Arc<dyn crate::bridge::memory_traits::Memory>
     }
 
     /// Create a new local memory client using the default `.openhuman` directory.
@@ -185,8 +185,8 @@ impl MemoryClient {
 
         let queue_depth = state.snapshot().queue_depth;
         state.mark_running(&placeholder_id, &title, &namespace);
-        crate::core::event_bus::publish_global(
-            crate::core::event_bus::DomainEvent::MemoryIngestionStarted {
+        crate::bridge::events::publish_global(
+            crate::bridge::events::DomainEvent::MemoryIngestionStarted {
                 document_id: placeholder_id.clone(),
                 title,
                 namespace: namespace.clone(),
@@ -208,8 +208,8 @@ impl MemoryClient {
             success,
             chrono::Utc::now().timestamp_millis(),
         );
-        crate::core::event_bus::publish_global(
-            crate::core::event_bus::DomainEvent::MemoryIngestionCompleted {
+        crate::bridge::events::publish_global(
+            crate::bridge::events::DomainEvent::MemoryIngestionCompleted {
                 document_id: placeholder_id,
                 namespace,
                 success,
@@ -232,7 +232,7 @@ impl MemoryClient {
     /// Maps generic skill/integration fields into the `NamespaceDocumentInput` structure.
     ///
     /// Every write goes in as
-    /// [`MemoryTaint::ExternalSync`](crate::openhuman::memory::MemoryTaint::ExternalSync)
+    /// [`MemoryTaint::ExternalSync`](crate::bridge::memory_traits::MemoryTaint::ExternalSync)
     /// — this entry point exists specifically for memory_sync providers
     /// (Gmail / Slack / Notion / Composio / etc.) that ingest text from
     /// third-party services. Routing the call through here is what lets
@@ -269,7 +269,7 @@ impl MemoryClient {
             // Every sync entry point is by definition ingesting third-
             // party content; mark it so the subconscious gate can see
             // the provenance through the persistence layer.
-            taint: crate::openhuman::memory::MemoryTaint::ExternalSync,
+            taint: crate::bridge::memory_traits::MemoryTaint::ExternalSync,
         };
 
         let doc_id = self.inner.upsert_document(input.clone()).await?;

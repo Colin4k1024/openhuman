@@ -6,7 +6,10 @@
 
 pub mod bridge;
 pub mod config;
-// pub mod store;  // TODO: enable once imports are fully resolved
+// Store module — imports rewritten, 176 type errors remain (bridge types need fleshing out).
+// Enable with: pub mod store;
+#[cfg(feature = "__compile_store")]
+pub mod store;
 
 // Re-export foundational crates
 pub use openhuman_embeddings as embeddings;

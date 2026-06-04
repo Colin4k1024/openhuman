@@ -413,7 +413,7 @@ impl UnifiedMemory {
             // so a forward-rolled schema variant or a bad UPDATE can't
             // silently downgrade a row to user-authored content.
             let taint_str: String = row.get(14).map_err(|e| e.to_string())?;
-            let taint = crate::openhuman::memory::MemoryTaint::from_db_str(&taint_str);
+            let taint = crate::bridge::memory_traits::MemoryTaint::from_db_str(&taint_str);
             docs.push(StoredMemoryDocument {
                 document_id: row.get(0).map_err(|e| e.to_string())?,
                 namespace: row.get(1).map_err(|e| e.to_string())?,

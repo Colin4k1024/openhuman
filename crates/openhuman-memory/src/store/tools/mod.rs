@@ -25,7 +25,7 @@ pub use raw_search::MemoryStoreRawSearchTool;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openhuman::tools::traits::Tool;
+    use crate::tools::traits::Tool;
 
     #[test]
     fn exports_memory_store_tools_with_stable_names() {

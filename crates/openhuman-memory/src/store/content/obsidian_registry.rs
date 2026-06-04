@@ -109,7 +109,7 @@ fn registration_in_files(content_root: &Path, files: &[PathBuf]) -> VaultRegistr
                 // Redact the path — it embeds the user's home/username.
                 log::warn!(
                     "[content_store::obsidian_registry] parse {} failed: {err} — skipping",
-                    crate::openhuman::memory::util::redact::redact(&path.display().to_string())
+                    crate::bridge::redact::redact(&path.display().to_string())
                 );
                 continue;
             }
@@ -126,7 +126,7 @@ fn registration_in_files(content_root: &Path, files: &[PathBuf]) -> VaultRegistr
                 log::debug!(
                     "[content_store::obsidian_registry] content root is a registered vault \
                      (matched in {})",
-                    crate::openhuman::memory::util::redact::redact(&path.display().to_string())
+                    crate::bridge::redact::redact(&path.display().to_string())
                 );
                 return VaultRegistration {
                     registered: true,

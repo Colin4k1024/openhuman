@@ -76,7 +76,7 @@ pub mod types {
     pub use crate::store::entities::EntityHit as Entity;
     pub use crate::store::trees::{SummaryNode as TreeNode, Tree, TreeKind};
     pub use crate::store::types::MemoryKvRecord as Kv;
-    pub use crate::openhuman::people::types::Person as Contact;
+    pub use crate::bridge::people::types::Person as Contact;
 }
 
 #[cfg(test)]

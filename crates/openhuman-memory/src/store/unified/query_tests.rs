@@ -62,7 +62,7 @@ async fn query_namespace_uses_graph_signal_for_document_ranking() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .unwrap();
@@ -105,7 +105,7 @@ async fn query_scores_relation_entities_found_in_document_content() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .unwrap();
@@ -282,7 +282,7 @@ async fn query_supporting_relations_contain_entity_types() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .unwrap();
@@ -389,7 +389,7 @@ async fn format_context_text_includes_entity_types() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::bridge::memory_traits::MemoryTaint::Internal,
         })
         .await
         .unwrap();
@@ -471,7 +471,7 @@ fn pref_doc(key: &str, content: &str) -> NamespaceDocumentInput {
         category: "core".to_string(),
         session_id: None,
         document_id: None,
-        taint: crate::openhuman::memory::MemoryTaint::Internal,
+        taint: crate::bridge::memory_traits::MemoryTaint::Internal,
     }
 }
 
@@ -638,7 +638,7 @@ fn situational_doc(key: &str, content: &str) -> NamespaceDocumentInput {
         category: "core".to_string(),
         session_id: None,
         document_id: None,
-        taint: crate::openhuman::memory::MemoryTaint::Internal,
+        taint: crate::bridge::memory_traits::MemoryTaint::Internal,
     }
 }
 

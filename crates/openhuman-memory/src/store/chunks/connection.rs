@@ -460,8 +460,8 @@ pub(crate) fn get_or_init_connection(config: &Config) -> Result<Arc<PMutex<Conne
                     db_path.display(),
                     CB_THRESHOLD
                 );
-                let _ = crate::core::event_bus::publish_global(
-                    crate::core::event_bus::DomainEvent::HealthChanged {
+                let _ = crate::bridge::events::publish_global(
+                    crate::bridge::events::DomainEvent::HealthChanged {
                         component: "memory_tree_db".to_string(),
                         healthy: false,
                         message: Some(format!(

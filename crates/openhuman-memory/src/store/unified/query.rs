@@ -214,7 +214,7 @@ impl UnifiedMemory {
                 // KV rows have no provenance column; conservatively
                 // surface as Internal so the subconscious gate doesn't
                 // mis-escalate user-state writes.
-                taint: crate::openhuman::memory::MemoryTaint::Internal,
+                taint: crate::bridge::memory_traits::MemoryTaint::Internal,
             });
         }
 
@@ -296,7 +296,7 @@ impl UnifiedMemory {
                     // Episodic rows are derived from user chat turns and
                     // never carry sync-ingest content; surface as
                     // Internal so the subconscious gate trusts them.
-                    taint: crate::openhuman::memory::MemoryTaint::Internal,
+                    taint: crate::bridge::memory_traits::MemoryTaint::Internal,
                 });
             }
         }
@@ -338,7 +338,7 @@ impl UnifiedMemory {
                 // Event extractions are derived from chat segments;
                 // treat them as Internal until a future migration
                 // surfaces per-event provenance.
-                taint: crate::openhuman::memory::MemoryTaint::Internal,
+                taint: crate::bridge::memory_traits::MemoryTaint::Internal,
             });
         }
 
@@ -477,7 +477,7 @@ impl UnifiedMemory {
                 document_id: None,
                 chunk_id: None,
                 supporting_relations: Vec::new(),
-                taint: crate::openhuman::memory::MemoryTaint::Internal,
+                taint: crate::bridge::memory_traits::MemoryTaint::Internal,
             });
         }
 

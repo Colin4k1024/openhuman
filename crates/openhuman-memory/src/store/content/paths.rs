@@ -20,7 +20,7 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::openhuman::memory::util::redact::redact;
+use crate::bridge::redact::redact;
 
 /// Which kind of summary tree a summary belongs to. Determines the
 /// folder name under `<content_root>/wiki/summaries/` — flattened

@@ -31,7 +31,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::config::Config;
-use crate::openhuman::memory::util::redact::{self, redact as redact_value};
+use crate::bridge::redact::{self, redact as redact_value};
 use crate::store::chunks::types::{Chunk, Metadata, SourceKind, SourceRef};
 use crate::store::content::StagedChunk;
 
@@ -1246,19 +1246,19 @@ fn migrate_legacy_embeddings_to_sidecar(conn: &Connection, config: &Config) -> R
     // migration; dedupe key = signature, so exactly one chain per space.
     let has_uncovered = has_uncovered_reembed_work(&*tx, &sig)?;
     if has_uncovered {
-        let backfill_job = crate::openhuman::memory_queue::types::NewJob::reembed_backfill(
-            &crate::openhuman::memory_queue::types::ReembedBackfillPayload {
+        let backfill_job = crate::queue::types::NewJob::reembed_backfill(
+            &crate::queue::types::ReembedBackfillPayload {
                 signature: sig.clone(),
             },
         )?;
-        crate::openhuman::memory_queue::enqueue_tx(&tx, &backfill_job)?;
+        crate::queue::enqueue_tx(&tx, &backfill_job)?;
     }
 
     tx.commit()?;
     conn.pragma_update(None, "user_version", TREE_EMBEDDING_MIGRATION_VERSION)
         .context("set PRAGMA user_version after #1574 migration")?;
     if has_uncovered {
-        crate::openhuman::memory_queue::set_backfill_in_progress(true);
+        crate::queue::set_backfill_in_progress(true);
     }
     log::info!(
         "[memory_tree::migrate] #1574 §7 done: copied chunks={copied_chunks} summaries={copied_summaries} \
