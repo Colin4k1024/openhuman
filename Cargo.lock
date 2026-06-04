@@ -5281,6 +5281,8 @@ dependencies = [
  "async-trait",
  "chrono",
  "dirs 5.0.1",
+ "hex",
+ "log",
  "once_cell",
  "openhuman-embeddings",
  "openhuman-memory-types",

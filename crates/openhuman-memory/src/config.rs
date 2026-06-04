@@ -72,3 +72,94 @@ pub struct EmbeddingRouteConfig {
     pub model: Option<String>,
     pub dimensions: Option<usize>,
 }
+
+/// Top-level config struct that the memory store expects.
+///
+/// In the full OpenHuman app, this is constructed from the main `Config`.
+/// When running standalone, it's loaded from a TOML file or env vars.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Config {
+    pub memory: MemoryConfig,
+    pub storage: StorageConfig,
+    pub embedding_routes: Vec<EmbeddingRouteConfig>,
+    /// Workspace root directory (where DBs and raw files live).
+    pub workspace_dir: PathBuf,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        let data_dir = default_data_dir();
+        Self {
+            memory: MemoryConfig::default(),
+            storage: StorageConfig::default(),
+            embedding_routes: Vec::new(),
+            workspace_dir: data_dir,
+        }
+    }
+}
+
+impl Config {
+    /// Returns the workspace directory.
+    pub fn workspace_dir(&self) -> &std::path::Path {
+        &self.workspace_dir
+    }
+
+    /// Returns the default root openhuman directory.
+    pub fn default_root_openhuman_dir() -> PathBuf {
+        default_data_dir()
+    }
+
+    /// Returns the content root for the memory tree vault.
+    pub fn memory_tree_content_root(&self) -> PathBuf {
+        self.workspace_dir.join("memory_tree")
+    }
+
+    /// Returns the local model override for a given workload (e.g. "embeddings").
+    pub fn workload_local_model(&self, _workload: &str) -> Option<String> {
+        // In standalone mode, no local model override.
+        // Full app wires this to local_ai config.
+        None
+    }
+}
+
+/// Storage provider configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct StorageConfig {
+    pub provider: StorageProviderConfig,
+}
+
+/// Storage provider details.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct StorageProviderConfig {
+    pub provider: String,
+}
+
+/// RPC config helpers (placeholder for config_rpc references in tools).
+pub mod rpc {
+    use super::Config;
+    use once_cell::sync::OnceCell;
+    use std::sync::Arc;
+
+    static GLOBAL_CONFIG: OnceCell<Arc<Config>> = OnceCell::new();
+
+    /// Set the global config (called once at startup).
+    pub fn set_config(config: Config) {
+        let _ = GLOBAL_CONFIG.set(Arc::new(config));
+    }
+
+    /// Get the global config.
+    pub fn get_config() -> Arc<Config> {
+        GLOBAL_CONFIG
+            .get()
+            .cloned()
+            .unwrap_or_else(|| Arc::new(Config::default()))
+    }
+}
+
+/// Returns the default root directory for OpenHuman data.
+pub fn default_root_openhuman_dir() -> PathBuf {
+    default_data_dir()
+}

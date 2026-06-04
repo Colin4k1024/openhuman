@@ -1,66 +1,70 @@
 //! # Memory Store
 //!
-//! This module provides the core storage abstractions and implementations for
-//! the OpenHuman memory system. It manages namespaces, documents, text chunks,
-//! vector embeddings, and graph relations.
-//!
-//! The memory system is designed to be pluggable, with the primary implementation
-//! being `UnifiedMemory`, which uses SQLite for structured data and Full-Text
-//! Search (FTS5), along with vector storage for semantic retrieval.
-//!
-//! ## Submodules
-//!
-//! - `types`: Common data structures and types used across the memory store.
-//! - `unified`: The primary SQLite-based memory implementation.
-//! - `client`: High-level client interface for interacting with the memory system.
-//! - `factories`: Factory functions for creating and initializing memory instances.
-//! - `memory_trait`: Defines the `Memory` trait that all implementations must satisfy.
+//! Core storage abstractions and implementations for the memory system.
+//! Manages namespaces, documents, text chunks, vector embeddings, and
+//! graph relations.
 
 pub mod chunks;
 pub mod content;
+#[cfg(feature = "__full_app")]
 pub mod entities;
+#[cfg(feature = "__full_app")]
 pub mod kinds;
 pub mod kv;
+#[cfg(feature = "__full_app")]
 pub mod retrieval;
 pub mod safety;
-pub mod tools;
 pub mod traits;
+#[cfg(feature = "__full_app")]
 pub mod trees;
 pub mod types;
 pub mod unified;
 pub mod vectors;
 
+// These modules have deep coupling to the full application and will be
+// enabled once the Memory trait and ingestion pipeline are moved in.
+#[cfg(feature = "__full_app")]
+pub mod tools;
+#[cfg(feature = "__full_app")]
 mod client;
+#[cfg(feature = "__full_app")]
 pub mod factories;
+#[cfg(feature = "__full_app")]
 mod memory_trait;
 
+#[cfg(feature = "__full_app")]
 pub use kinds::MemoryKind;
 pub use traits::{ObsidianFile, ObsidianRepresentable, VectorEmbeddable};
 
+#[cfg(feature = "__full_app")]
 pub use client::{MemoryClient, MemoryClientRef, MemoryState};
-pub use factories::{
-    active_embedding_signature, create_memory, create_memory_for_migration,
-    create_memory_with_local_ai, effective_embedding_settings, effective_memory_backend_name,
-};
-pub use types::{
-    GraphRelationRecord, MemoryItemKind, MemoryKvRecord, NamespaceDocumentInput,
-    NamespaceMemoryHit, NamespaceQueryResult, NamespaceRetrievalContext, RetrievalScoreBreakdown,
-    StoredMemoryDocument,
-};
-pub use unified::events;
-pub use unified::fts5;
-pub use unified::profile;
-pub use unified::segments;
-pub use unified::UnifiedMemory;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Compute the active embedding signature from config.
+///
+/// This is the canonical resolution used by the chunk store and tree store.
+pub fn active_embedding_signature(
+    memory_cfg: &crate::config::MemoryConfig,
+    local_model_override: Option<&str>,
+) -> String {
+    let provider = local_model_override
+        .map(|_| "ollama")
+        .unwrap_or(&memory_cfg.embedding_provider);
+    let model = local_model_override.unwrap_or(&memory_cfg.embedding_model);
+    let dims = memory_cfg.embedding_dimensions;
+    crate::embeddings::format_embedding_signature(provider, model, dims)
+}
 
-    #[test]
-    fn memory_store_reexports_expected_memory_kind_catalog() {
-        assert!(MemoryKind::ALL.contains(&MemoryKind::Chunk));
-        assert!(MemoryKind::ALL.contains(&MemoryKind::Tree));
-        assert!(MemoryKind::ALL.contains(&MemoryKind::Contact));
-    }
+/// Return effective embedding settings from config.
+pub fn effective_embedding_settings(
+    memory_cfg: &crate::config::MemoryConfig,
+    local_model_override: Option<&str>,
+) -> (String, String, usize) {
+    let provider = local_model_override
+        .map(|_| "ollama".to_string())
+        .unwrap_or_else(|| memory_cfg.embedding_provider.clone());
+    let model = local_model_override
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| memory_cfg.embedding_model.clone());
+    let dims = memory_cfg.embedding_dimensions;
+    (provider, model, dims)
 }

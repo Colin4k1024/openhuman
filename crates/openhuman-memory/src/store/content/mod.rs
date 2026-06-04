@@ -19,6 +19,7 @@ pub mod obsidian_registry;
 pub mod paths;
 pub mod raw;
 pub mod read;
+#[cfg(feature = "__full_app")]
 pub mod tags;
 
 use std::path::Path;
@@ -47,6 +48,7 @@ pub struct StagedChunk {
 /// extraction job runs.
 ///
 /// Delegates to [`tags::update_summary_tags`].
+#[cfg(feature = "__full_app")]
 pub fn update_summary_tags(
     config: &crate::config::Config,
     summary_id: &str,

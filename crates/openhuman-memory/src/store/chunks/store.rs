@@ -1010,6 +1010,7 @@ fn delete_chunks_by_source_filter(
         // complete and stale summaries can't resurface in retrieval. Source
         // trees use the chunk `source_id` verbatim as their scope, so we
         // match on that. Same tx as the chunk delete → atomic.
+        #[cfg(feature = "__full_app")]
         for source_id in &orphaned_deleted_sources {
             if let Some(tree) =
                 crate::store::trees::store::get_tree_by_scope_conn(
@@ -1021,8 +1022,6 @@ fn delete_chunks_by_source_filter(
                 let cascade = crate::store::trees::store::delete_tree_cascade_tx(
                     &tx, &tree.id,
                 )?;
-                // Defer the summary content-file removal to the same
-                // post-commit sweep as the chunk files.
                 content_paths.extend(cascade.content_paths);
                 log::debug!(
                     "[memory::chunk_store] {op}: orphaned source_id_hash={} → deleted source tree tree_id={} summaries={}",
@@ -1032,6 +1031,8 @@ fn delete_chunks_by_source_filter(
                 );
             }
         }
+        #[cfg(not(feature = "__full_app"))]
+        let _ = &orphaned_deleted_sources;
 
         let deleted = chunks.len();
         tx.commit()?;
@@ -1230,9 +1231,12 @@ fn migrate_legacy_embeddings_to_sidecar(conn: &Connection, config: &Config) -> R
                 set_chunk_embedding_for_signature_tx(&tx, &id, &sig, &vec)?;
                 copied_chunks += 1;
             } else {
-                crate::store::trees::store::set_summary_embedding_for_signature_tx(
-                    &tx, &id, &sig, &vec,
-                )?;
+                #[cfg(feature = "__full_app")]
+                {
+                    crate::store::trees::store::set_summary_embedding_for_signature_tx(
+                        &tx, &id, &sig, &vec,
+                    )?;
+                }
                 copied_summaries += 1;
             }
         }

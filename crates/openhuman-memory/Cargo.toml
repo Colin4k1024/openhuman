@@ -10,6 +10,8 @@ openhuman-embeddings = { path = "../openhuman-embeddings" }
 openhuman-memory-types = { path = "../openhuman-memory-types" }
 
 dirs = "5"
+hex = "0.4"
+log = "0.4"
 anyhow = "1"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
@@ -24,6 +26,9 @@ sha2 = "0.10"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 uuid = { version = "1", features = ["v4"] }
+
+[features]
+__compile_store = []
 
 [dev-dependencies]
 tempfile = "3"

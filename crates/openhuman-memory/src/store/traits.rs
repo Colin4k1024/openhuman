@@ -19,8 +19,19 @@
 use std::path::PathBuf;
 
 use crate::store::chunks::types::Chunk;
-use crate::store::kinds::MemoryKind;
-use crate::store::trees::{SummaryNode, Tree};
+// MemoryKind: minimal copy for standalone compilation.
+// The full version lives in kinds.rs (gated behind __full_app).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MemoryKind {
+    Raw,
+    Chunk,
+    Entity,
+    Tree,
+    Vector,
+    Kv,
+    Contact,
+}
+use crate::types::tree::{SummaryNode, Tree};
 use crate::bridge::people::types::Person;
 
 /// A rendered Obsidian markdown file: where it lives in the vault and what
@@ -218,7 +229,7 @@ mod tests {
         let node = SummaryNode {
             id: "summary-1".into(),
             tree_id: "tree-1".into(),
-            tree_kind: crate::store::trees::TreeKind::Source,
+            tree_kind: crate::types::tree::TreeKind::Source,
             level: 1,
             parent_id: None,
             child_ids: vec!["chunk-1".into()],
@@ -248,11 +259,11 @@ mod tests {
     fn tree_traits_render_obsidian_metadata() {
         let tree = Tree {
             id: "tree-1".into(),
-            kind: crate::store::trees::TreeKind::Topic,
+            kind: crate::types::tree::TreeKind::Topic,
             scope: "topic:phoenix".into(),
             root_id: Some("summary-root".into()),
             max_level: 2,
-            status: crate::store::trees::TreeStatus::Active,
+            status: crate::types::tree::TreeStatus::Active,
             created_at: Utc::now(),
             last_sealed_at: None,
         };
