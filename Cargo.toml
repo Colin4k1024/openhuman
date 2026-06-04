@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/openhuman-embeddings", "crates/openhuman-memory-types"]
+members = [".", "crates/openhuman-embeddings", "crates/openhuman-memory-types", "crates/openhuman-memory"]
 
 [package]
 name = "openhuman"
@@ -38,6 +38,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 openhuman-embeddings = { path = "crates/openhuman-embeddings" }
+openhuman-memory = { path = "crates/openhuman-memory" }
 openhuman-memory-types = { path = "crates/openhuman-memory-types" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

@@ -5190,6 +5190,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "once_cell",
  "openhuman-embeddings",
+ "openhuman-memory",
  "openhuman-memory-types",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -5270,6 +5271,30 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "openhuman-memory"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "dirs 5.0.1",
+ "once_cell",
+ "openhuman-embeddings",
+ "openhuman-memory-types",
+ "parking_lot",
+ "regex",
+ "reqwest 0.12.28",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "uuid 1.23.1",
 ]
 
 [[package]]
