@@ -31,6 +31,7 @@ uuid = { version = "1", features = ["v4"] }
 
 [features]
 __compile_store = []
+__full_app = []
 
 [dev-dependencies]
 tempfile = "3"
