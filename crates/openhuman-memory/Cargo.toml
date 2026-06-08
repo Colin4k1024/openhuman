@@ -10,6 +10,7 @@ openhuman-embeddings = { path = "../openhuman-embeddings" }
 openhuman-memory-types = { path = "../openhuman-memory-types" }
 
 dirs = "5"
+futures = "0.3"
 futures-util = "0.3"
 hex = "0.4"
 log = "0.4"

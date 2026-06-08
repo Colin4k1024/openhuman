@@ -23,10 +23,10 @@ use chrono::{TimeZone, Utc};
 use tempfile::TempDir;
 
 use crate::config::Config;
-use crate::openhuman::memory::ingest_pipeline::ingest_chat;
+use crate::orchestration::ingest_pipeline::ingest_chat;
 use crate::queue::testing::drain_until_idle;
 use crate::store::chunks::types::SourceKind;
-use crate::openhuman::memory_sync::canonicalize::chat::{ChatBatch, ChatMessage};
+use crate::sync::canonicalize::chat::{ChatBatch, ChatMessage};
 use crate::tree::retrieval::{fetch_leaves, query_source, search_entities};
 
 /// Shared test config — disables embedding for deterministic inert behaviour.

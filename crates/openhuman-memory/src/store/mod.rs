@@ -31,6 +31,8 @@ mod memory_trait;
 
 pub use kinds::MemoryKind;
 pub use traits::{ObsidianFile, ObsidianRepresentable, VectorEmbeddable};
+pub use unified::profile;
+pub use unified::UnifiedMemory;
 
 #[cfg(feature = "__full_app")]
 pub use client::{MemoryClient, MemoryClientRef, MemoryState};

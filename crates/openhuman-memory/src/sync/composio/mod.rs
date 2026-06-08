@@ -17,10 +17,10 @@ pub mod bus;
 pub mod periodic;
 pub mod providers;
 
-use crate::bridge::composio::client::{
+use crate::bridge::composio::{
     create_composio_client, direct_list_connections, ComposioClientKind,
 };
-use crate::bridge::composio::types::ComposioConnection;
+use crate::bridge::composio::ComposioConnection;
 use crate::config::Config;
 
 pub use bus::{

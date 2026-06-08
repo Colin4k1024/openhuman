@@ -14,10 +14,10 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
-use crate::bridge::composio::client::{
+use crate::bridge::composio::{
     create_composio_client, direct_list_connections, ComposioClientKind,
 };
-use crate::bridge::composio::types::ComposioConnectionsResponse;
+use crate::bridge::composio::ComposioConnectionsResponse;
 use crate::config::Config;
 use crate::orchestration::global::client_if_ready;
 use crate::sync::composio::providers::registry::get_provider;

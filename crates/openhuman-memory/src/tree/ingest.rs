@@ -236,7 +236,7 @@ async fn cascade_from(config: &Config, tree: &Tree, start_level: u32) -> Result<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openhuman::memory::tree_source::registry::get_or_create_source_tree;
+    use crate::orchestration::tree_source::registry::get_or_create_source_tree;
     use tempfile::TempDir;
 
     fn test_config(tmp: &TempDir) -> Config {

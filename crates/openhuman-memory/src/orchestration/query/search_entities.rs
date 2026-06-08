@@ -2,7 +2,7 @@ use crate::config::rpc as config_rpc;
 use crate::tree::retrieval;
 use crate::tree::retrieval::rpc::SearchEntitiesRequest;
 use crate::tree::score::extract::EntityKind;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 
@@ -88,7 +88,7 @@ mod tests {
     use tempfile::TempDir;
 
     use crate::config::{Config, TEST_ENV_LOCK};
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     struct WorkspaceEnvGuard {

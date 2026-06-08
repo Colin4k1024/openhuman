@@ -28,6 +28,10 @@ pub struct TurnContext {
 pub trait PostTurnHook: Send + Sync {
     fn name(&self) -> &str;
     async fn after_turn(&self, ctx: &TurnContext) -> anyhow::Result<()>;
+    /// Called when a turn completes (optional).
+    async fn on_turn_complete(&self, _ctx: &TurnContext) -> anyhow::Result<()> {
+        Ok(())
+    }
 }
 
 /// Session transcript — a parsed conversation record.

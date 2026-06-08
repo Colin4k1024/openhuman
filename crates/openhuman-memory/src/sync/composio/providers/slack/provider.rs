@@ -44,7 +44,7 @@ use super::users::SlackUsers;
 // `ComposioClient` is no longer referenced directly — actions dispatch
 // through `ProviderContext::execute` which resolves the client via the
 // mode-aware factory per call (#1710).
-use crate::bridge::composio::types::ComposioExecuteResponse;
+use crate::bridge::composio::ComposioExecuteResponse;
 use crate::sync::composio::providers::sync_state::SyncState;
 use crate::sync::composio::providers::{
     pick_str, ComposioProvider, CuratedTool, ProviderContext, ProviderUserProfile, SyncOutcome,

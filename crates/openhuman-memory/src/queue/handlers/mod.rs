@@ -53,8 +53,8 @@ fn emit_build_progress(
     item_count: Option<u32>,
     detail: Option<String>,
 ) {
-    crate::core::event_bus::publish_global(
-        crate::core::event_bus::DomainEvent::MemoryTreeBuildProgress {
+    crate::bridge::events::publish_global(
+        crate::bridge::events::MemoryEvent::MemoryTreeBuildProgress {
             phase: phase.to_string(),
             step: step.to_string(),
             tree_scope: tree_scope.map(str::to_string),

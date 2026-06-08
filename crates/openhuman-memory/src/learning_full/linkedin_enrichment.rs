@@ -309,7 +309,7 @@ async fn write_profile_md(
 /// Ask the backend LLM to distil the raw LinkedIn Markdown into a
 /// concise, high-signal profile document suitable for agent context.
 pub async fn summarise_profile_with_llm(config: &Config, raw_md: &str) -> anyhow::Result<String> {
-    use crate::bridge::inference::provider::ops::{
+    use crate::bridge::inference::ops::{
         create_backend_inference_provider, ProviderRuntimeOptions,
     };
 
@@ -513,7 +513,7 @@ pub fn render_profile_markdown(url: &str, data: &serde_json::Value) -> String {
 /// `payload.parts[].body.data`. We must decode those parts before
 /// regex-matching; searching the raw JSON alone misses them.
 async fn search_gmail_for_linkedin(config: &Config) -> anyhow::Result<Option<String>> {
-    use crate::bridge::composio::client::{
+    use crate::bridge::composio::{
         create_composio_client, direct_execute, ComposioClientKind,
     };
     use base64::engine::general_purpose::URL_SAFE_NO_PAD;

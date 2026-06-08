@@ -2,8 +2,8 @@
 
 use serde_json::{Map, Value};
 
-use crate::core::all::{ControllerFuture, RegisteredController};
-use crate::core::{ControllerSchema, FieldSchema, TypeSchema};
+use crate::core_types::all::{ControllerFuture, RegisteredController};
+use crate::core_types::{ControllerSchema, FieldSchema, TypeSchema};
 use crate::config::rpc as config_rpc;
 use crate::rpc::RpcOutcome;
 

@@ -39,7 +39,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use crate::core::event_bus::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
+use crate::bridge::events::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
 use crate::bridge::composio::providers::profile_md::replace_managed_block;
 use crate::learning_full::cache::FacetCache;
 use crate::store::profile::UserState;

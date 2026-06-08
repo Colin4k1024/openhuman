@@ -4,7 +4,7 @@
 //! configured LLM (local Ollama or cloud reasoning model), parses structured
 //! JSON output, and stores observations in memory.
 
-use crate::bridge::agent::hooks::{PostTurnHook, TurnContext};
+use crate::bridge::agent::{PostTurnHook, TurnContext};
 use crate::config::{Config, LearningConfig, ReflectionSource};
 use crate::learning_full::candidate::{self, CueFamily, EvidenceRef, FacetClass};
 use crate::orchestration::{Memory, MemoryCategory};
@@ -44,7 +44,7 @@ pub struct ReflectionHook {
     config: LearningConfig,
     full_config: Arc<Config>,
     memory: Arc<dyn Memory>,
-    provider: Option<Arc<dyn crate::bridge::inference::provider::Provider>>,
+    provider: Option<Arc<dyn crate::bridge::inference::Provider>>,
     /// Per-session reflection counts for throttling. Key is session_id (or "__global__").
     session_counts: Mutex<HashMap<String, usize>>,
 }
@@ -54,7 +54,7 @@ impl ReflectionHook {
         config: LearningConfig,
         full_config: Arc<Config>,
         memory: Arc<dyn Memory>,
-        provider: Option<Arc<dyn crate::bridge::inference::provider::Provider>>,
+        provider: Option<Arc<dyn crate::bridge::inference::Provider>>,
     ) -> Self {
         Self {
             config,
@@ -191,7 +191,7 @@ impl ReflectionHook {
                 log::debug!(
                     "[learning::reflection] local route — gate permit acquired via LocalAiService"
                 );
-                let service = crate::bridge::inference::local::global(&self.full_config);
+                let service = crate::config::global(&self.full_config);
                 service
                     .prompt(&self.full_config, prompt, Some(512), true)
                     .await

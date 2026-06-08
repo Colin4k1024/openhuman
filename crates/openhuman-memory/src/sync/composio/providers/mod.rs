@@ -58,7 +58,7 @@ pub mod registry;
 pub mod slack;
 pub mod sync_state;
 
-use crate::bridge::composio::types::ComposioCapability;
+use crate::bridge::composio::ComposioCapability;
 
 const CAPABILITY_TOOLKITS: &[&str] = &[
     "gmail",

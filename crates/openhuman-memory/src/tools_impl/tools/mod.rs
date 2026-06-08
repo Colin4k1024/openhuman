@@ -13,7 +13,7 @@ pub use put::MemoryToolsPutTool;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
 
     #[test]
     fn exports_memory_tool_wrappers_with_stable_names() {

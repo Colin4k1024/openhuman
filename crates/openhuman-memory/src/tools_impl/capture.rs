@@ -35,7 +35,7 @@ use async_trait::async_trait;
 
 use super::store::ToolMemoryStore;
 use super::types::{ToolMemoryPriority, ToolMemorySource};
-use crate::bridge::agent::hooks::{PostTurnHook, ToolCallRecord, TurnContext};
+use crate::bridge::agent::{PostTurnHook, ToolCallRecord, TurnContext};
 use crate::orchestration::Memory;
 
 /// Maximum length (chars) of the captured rule body — keeps malformed or
@@ -288,7 +288,7 @@ fn tool_aliases(tool_name: &str) -> Vec<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::agent::hooks::ToolCallRecord;
+    use crate::bridge::agent::ToolCallRecord;
     use crate::tools_impl::store::ToolMemoryStore;
     use crate::tools_impl::test_helpers::MockMemory;
 

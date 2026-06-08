@@ -22,7 +22,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use async_trait::async_trait;
 
-use crate::core::event_bus::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
+use crate::bridge::events::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
 use crate::learning_full::candidate::{
     self, CueFamily, EvidenceRef, FacetClass, LearningCandidate,
 };
@@ -531,7 +531,7 @@ impl EventHandler for EmailSignatureSubscriber {
 
 /// Register the email signature subscriber on the global event bus.
 ///
-/// Must be called at startup after [`crate::core::event_bus::init_global`].
+/// Must be called at startup after [`crate::bridge::events::init_global`].
 /// The returned handle keeps the subscription alive — store it in a long-lived
 /// container (e.g. alongside other `SubscriptionHandle`s in startup).
 pub fn register_email_signature_subscriber() -> Option<SubscriptionHandle> {

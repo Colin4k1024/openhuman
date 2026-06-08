@@ -8,7 +8,7 @@
 
 use crate::config::Config;
 use crate::tree::health::async_run_doctor;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 use std::sync::Arc;

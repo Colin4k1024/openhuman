@@ -41,7 +41,7 @@
 //! post-loop fallback (which only existed to rescue the
 //! `"i prefer<punct>"` shape) is no longer needed and was removed.
 
-use crate::bridge::agent::hooks::{PostTurnHook, TurnContext};
+use crate::bridge::agent::{PostTurnHook, TurnContext};
 use crate::config::LearningConfig;
 use crate::orchestration::{Memory, MemoryCategory};
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
@@ -270,7 +270,7 @@ fn slugify(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::agent::hooks::TurnContext;
+    use crate::bridge::agent::TurnContext;
     use crate::orchestration::{Memory, MemoryCategory, MemoryEntry};
     use async_trait::async_trait;
     use parking_lot::Mutex;

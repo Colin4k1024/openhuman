@@ -12,7 +12,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::config::{Config, DEFAULT_CLOUD_LLM_MODEL};
-use crate::bridge::inference::provider::{
+use crate::bridge::inference::{
     create_chat_provider, provider_for_role, ChatMessage, ChatRequest, Provider, UsageInfo,
 };
 

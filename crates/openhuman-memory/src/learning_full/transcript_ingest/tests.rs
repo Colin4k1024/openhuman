@@ -5,7 +5,7 @@
 
 use super::*;
 use crate::bridge::agent::harness::session::transcript::{SessionTranscript, TranscriptMeta};
-use crate::bridge::inference::provider::ChatMessage;
+use crate::bridge::inference::ChatMessage;
 use crate::orchestration::{Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts};
 use async_trait::async_trait;
 use std::path::PathBuf;

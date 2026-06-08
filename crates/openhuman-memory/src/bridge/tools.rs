@@ -32,6 +32,25 @@ impl ToolResult {
     }
 }
 
+/// Permission level for a tool.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub enum PermissionLevel {
+    #[default]
+    ReadOnly,
+    Write,
+    Admin,
+}
+
+/// Tool category for grouping.
+#[derive(Clone, Debug, Default)]
+pub enum ToolCategory {
+    #[default]
+    General,
+    Memory,
+    System,
+    Network,
+}
+
 /// Trait all agent tools implement.
 #[async_trait]
 pub trait Tool: Send + Sync {
@@ -46,4 +65,19 @@ pub trait Tool: Send + Sync {
 
     /// Execute the tool with the given arguments.
     async fn execute(&self, args: Value) -> ToolResult;
+
+    /// Permission level required.
+    fn permission_level(&self) -> PermissionLevel {
+        PermissionLevel::ReadOnly
+    }
+
+    /// Whether this tool can be called concurrently.
+    fn is_concurrency_safe(&self) -> bool {
+        true
+    }
+
+    /// Tool category.
+    fn category(&self) -> ToolCategory {
+        ToolCategory::General
+    }
 }

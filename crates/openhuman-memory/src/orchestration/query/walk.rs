@@ -17,12 +17,12 @@
 
 use crate::config::rpc as config_rpc;
 use crate::config::Config;
-use crate::bridge::inference::provider::traits::{ChatMessage, Provider};
+use crate::bridge::inference::{ChatMessage, ChatProvider as Provider};
 use crate::orchestration::chat::{build_chat_provider, ChatPrompt};
 use crate::tree::retrieval;
 use crate::tree::retrieval::fetch::fetch_leaves as do_fetch_leaves;
 use crate::tree::tree_runtime::store::{read_children, read_node};
-use crate::bridge::tools::traits::{PermissionLevel, Tool, ToolCategory, ToolResult};
+use crate::bridge::tools::{PermissionLevel, Tool, ToolCategory, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 
@@ -739,7 +739,7 @@ fn synthesize_fallback_answer(trace: &[WalkStep]) -> String {
 mod tests {
     use super::*;
     use crate::config::Config;
-    use crate::bridge::inference::provider::traits::ChatMessage;
+    use crate::bridge::inference::ChatMessage;
     use crate::tree::tree_runtime::store::write_node;
     use crate::tree::tree_runtime::types::{NodeLevel, TreeNode};
     use async_trait::async_trait;

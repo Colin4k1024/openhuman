@@ -56,6 +56,37 @@ pub mod providers {
     }
 }
 
+/// Composio client kind.
+#[derive(Clone, Debug)]
+pub enum ComposioClientKind {
+    Default,
+    Custom(String),
+}
+
+/// Create a composio client (stub).
+pub fn create_composio_client(
+    _config: &crate::config::Config,
+    _kind: ComposioClientKind,
+) -> anyhow::Result<Box<dyn ComposioClient>> {
+    anyhow::bail!("composio client not available in standalone mode")
+}
+
+/// Direct list connections (stub).
+pub async fn direct_list_connections(
+    _config: &crate::config::Config,
+) -> anyhow::Result<Vec<ConnectedIntegration>> {
+    Ok(Vec::new())
+}
+
+/// Direct execute (stub).
+pub async fn direct_execute(
+    _config: &crate::config::Config,
+    _action: &str,
+    _params: serde_json::Value,
+) -> anyhow::Result<serde_json::Value> {
+    anyhow::bail!("composio execute not available in standalone mode")
+}
+
 /// Profile.md managed-block helpers.
 pub mod profile_md {
     /// Start marker for a managed block.

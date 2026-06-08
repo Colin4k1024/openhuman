@@ -53,7 +53,7 @@ use crate::bridge::scheduler::gate::current_policy;
 use crate::bridge::scheduler::policy::PauseReason;
 
 use super::providers::{get_provider, ProviderContext, SyncReason};
-use crate::bridge::composio::client::{
+use crate::bridge::composio::{
     create_composio_client, direct_list_connections, ComposioClientKind,
 };
 use crate::bridge::composio::ops;

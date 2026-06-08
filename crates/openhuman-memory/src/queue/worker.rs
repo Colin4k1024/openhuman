@@ -77,7 +77,7 @@ pub fn start(config: Config) {
         // Hard kills still fall back to lease-expiry recovery at startup
         // (bug-report-2026-05-26 I2).
         let shutdown_cfg = config.clone();
-        crate::core::shutdown::register(move || {
+        crate::core_types::shutdown::register(move || {
             // NOTE: `shutdown::register` is bound `F: Fn() -> Fut`, so this
             // closure may be invoked more than once; each call must hand the
             // returned future its own owned `Config`. Moving `shutdown_cfg`
@@ -144,7 +144,7 @@ pub fn start(config: Config) {
                                 );
                                 tokio::time::sleep(Duration::from_secs(30)).await;
                             } else {
-                                crate::core::observability::report_error(
+                                crate::core_types::observability::report_error(
                                     &err,
                                     "memory",
                                     "tree_jobs_worker",

@@ -30,7 +30,7 @@ pub use walk::MemoryTreeWalkTool as MemoryQueryWalkTool;
 pub use walk::{run_walk, MemoryTreeWalkTool, WalkOptions, WalkOutcome, WalkStep, WalkStopReason};
 pub use MemoryTreeTool as MemoryQueryTool;
 
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 
@@ -160,7 +160,7 @@ impl Tool for MemoryTreeTool {
 #[cfg(test)]
 mod memory_tree_dispatcher_tests {
     use super::*;
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     #[test]

@@ -8,7 +8,7 @@ use crate::orchestration::ops::helpers::active_memory_client;
 use crate::tools_impl::{
     ToolMemoryPriority, ToolMemoryRule, ToolMemorySource, ToolMemoryStore,
 };
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 
 pub struct MemoryToolsPutTool;
 
@@ -108,7 +108,7 @@ mod tests {
 
     use crate::config::{Config, TEST_ENV_LOCK};
     use crate::tools_impl::ToolMemoryStore;
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     struct WorkspaceEnvGuard {

@@ -4,7 +4,7 @@
 //!
 //! 1. accept a manual or scheduled sync request
 //! 2. emit coarse lifecycle events for UI visibility
-//! 3. dispatch into [`crate::openhuman::memory_sync`] backends
+//! 3. dispatch into [`crate::sync`] backends
 //! 4. rely on `memory_store` + `memory_queue` + `memory_tree` backends to
 //!    persist, enqueue, ingest, and seal the resulting data
 //!
@@ -16,7 +16,7 @@ use std::sync::{Arc, OnceLock};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::core::event_bus::{
+use crate::bridge::events::{
     publish_global, subscribe_global, DomainEvent, EventHandler, SubscriptionHandle,
 };
 
@@ -164,7 +164,7 @@ mod tests {
     use super::*;
     use std::sync::{Arc, Mutex, OnceLock};
 
-    use crate::core::event_bus::{self, init_global, subscribe_global};
+    use crate::bridge::events::{self, init_global, subscribe_global};
 
     fn test_mutex() -> &'static std::sync::Mutex<()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();

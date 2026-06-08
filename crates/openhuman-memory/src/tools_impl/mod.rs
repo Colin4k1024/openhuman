@@ -31,7 +31,7 @@
 //! - [`tools`]   — agent-facing read/write tools:
 //!   [`tools::MemoryToolsListTool`], [`tools::MemoryToolsPutTool`].
 //!
-//! [`PostTurnHook`]: crate::bridge::agent::hooks::PostTurnHook
+//! [`PostTurnHook`]: crate::bridge::agent::PostTurnHook
 
 pub mod capture;
 pub mod prompt;

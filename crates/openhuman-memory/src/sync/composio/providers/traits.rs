@@ -95,7 +95,7 @@ pub trait ComposioProvider: Send + Sync {
     }
 
     /// Hook fired when an OAuth handoff completes
-    /// ([`crate::core::event_bus::DomainEvent::ComposioConnectionCreated`]).
+    /// ([`crate::bridge::events::MemoryEvent::ComposioConnectionCreated`]).
     ///
     /// Default impl: fetch the user profile, then run an initial sync.
     /// Providers can override to add provider-specific bootstrapping

@@ -18,7 +18,7 @@ use tokio::sync::mpsc;
 
 use super::state::IngestionState;
 use super::MemoryIngestionConfig;
-use crate::core::event_bus::{publish_global, DomainEvent};
+use crate::bridge::events::{publish_global, MemoryEvent as DomainEvent};
 use crate::store::{NamespaceDocumentInput, UnifiedMemory};
 
 /// Default capacity of the ingestion job channel.
@@ -259,7 +259,7 @@ async fn ingestion_worker(
                 true
             }
             Err(e) => {
-                crate::core::observability::report_error(
+                crate::core_types::observability::report_error(
                     &e,
                     "memory",
                     "ingestion_extract",

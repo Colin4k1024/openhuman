@@ -12,13 +12,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::config::Config;
-use crate::openhuman::memory::ingest_pipeline::{
+use crate::orchestration::ingest_pipeline::{
     ingest_chat as do_ingest_chat, ingest_document as do_ingest_document,
     ingest_email as do_ingest_email, IngestResult,
 };
 use crate::store::chunks::store::{self as chunk_store, ListChunksQuery};
 use crate::store::chunks::types::{Chunk, SourceKind};
-use crate::openhuman::memory_sync::canonicalize::{
+use crate::sync::canonicalize::{
     chat::ChatBatch, document::DocumentInput, email::EmailThread,
 };
 use crate::rpc::RpcOutcome;
@@ -783,10 +783,10 @@ pub async fn set_enabled_rpc(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openhuman::memory_queue as jobs;
+    use crate::queue as jobs;
     use crate::queue::store::count_total;
     use crate::store::chunks::types::SourceKind;
-    use crate::openhuman::memory_sync::canonicalize::document::DocumentInput;
+    use crate::sync::canonicalize::document::DocumentInput;
     use chrono::{Duration as ChronoDuration, Utc};
     use serde_json::json;
     use tempfile::TempDir;

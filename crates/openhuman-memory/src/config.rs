@@ -130,6 +130,17 @@ pub struct SchedulerGateConfig {
 pub struct ReliabilityConfig {
     pub max_retries: u32,
     pub timeout_secs: u64,
+    pub provider_retries: u32,
+    pub provider_backoff_ms: u64,
+}
+
+/// Learning configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct LearningConfig {
+    pub enabled: bool,
+    pub reflection_interval_secs: u64,
+    pub max_candidates: usize,
 }
 
 /// Top-level config struct that the memory store expects.
@@ -155,6 +166,8 @@ pub struct Config {
     pub output_language: Option<String>,
     /// Embedding provider name.
     pub embeddings_provider: Option<String>,
+    /// Learning configuration.
+    pub learning: LearningConfig,
 }
 
 impl Default for Config {
@@ -173,6 +186,7 @@ impl Default for Config {
             default_model: None,
             output_language: None,
             embeddings_provider: None,
+            learning: LearningConfig::default(),
         }
     }
 }
@@ -234,6 +248,17 @@ pub mod rpc {
             .get()
             .cloned()
             .unwrap_or_else(|| Arc::new(Config::default()))
+    }
+
+    /// Load config with timeout (async, returns the global config).
+    /// In the full app this waits for config to be ready; here it returns immediately.
+    pub async fn load_config_with_timeout() -> Result<Arc<Config>, String> {
+        Ok(get_config())
+    }
+
+    /// Alias for synchronous access.
+    pub fn config() -> Arc<Config> {
+        get_config()
     }
 }
 

@@ -2,7 +2,7 @@ use crate::config::rpc as config_rpc;
 use crate::store::chunks::types::SourceKind;
 use crate::sync::canonicalize::document::DocumentInput;
 use crate::tree::tree::rpc;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use chrono::Utc;
 use serde_json::json;
@@ -149,7 +149,7 @@ mod tests {
 
     use crate::config::{Config, TEST_ENV_LOCK};
     use crate::store::chunks::types::SourceRef;
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     struct WorkspaceEnvGuard {

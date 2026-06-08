@@ -9,7 +9,7 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-use crate::core::event_bus::{publish_global, DomainEvent};
+use crate::bridge::events::{publish_global, MemoryEvent as DomainEvent};
 use crate::config::Config;
 use crate::orchestration::util::redact::redact;
 use crate::queue::{self as jobs, ExtractChunkPayload, NewJob};

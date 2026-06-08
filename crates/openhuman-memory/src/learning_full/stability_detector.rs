@@ -33,8 +33,8 @@
 
 use std::collections::HashMap;
 
-use crate::core::event_bus;
-use crate::core::event_bus::DomainEvent;
+use crate::core_types::event_bus;
+use crate::bridge::events::MemoryEvent as DomainEvent;
 use crate::learning_full::cache::FacetCache;
 use crate::learning_full::candidate::{self, CueFamily, FacetClass, LearningCandidate};
 use crate::store::profile::{FacetState, FacetType, ProfileFacet, UserState};

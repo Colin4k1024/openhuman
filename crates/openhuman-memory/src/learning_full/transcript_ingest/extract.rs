@@ -18,7 +18,7 @@
 //! - Tool messages are never mined — they're high-noise and fully
 //!   reconstructable from the transcript itself.
 
-use crate::bridge::inference::provider::ChatMessage;
+use crate::bridge::inference::ChatMessage;
 
 use super::types::{CandidateKind, ConversationReflection, Importance, MemoryCandidate};
 

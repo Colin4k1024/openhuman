@@ -51,14 +51,14 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 
-use crate::core::event_bus::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
+use crate::bridge::events::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
 use crate::bridge::agent::triage::{apply_decision, run_triage, TriageOutcome, TriggerEnvelope};
 use crate::bridge::composio::trigger_history;
 use crate::config::rpc as config_rpc;
 use crate::config::schema::COMPOSIO_MODE_DIRECT;
 
 use super::providers::{get_provider, ProviderContext};
-use crate::bridge::composio::client::ComposioClient;
+use crate::bridge::composio::ComposioClient;
 use crate::bridge::composio::ops;
 use crate::bridge::composio::FetchConnectedIntegrationsStatus;
 
@@ -367,7 +367,7 @@ impl EventHandler for ComposioTriggerSubscriber {
                         "[composio][triage] run_triage failed (label={}): {e:#}",
                         envelope.display_label
                     );
-                    crate::core::observability::report_error_or_expected(
+                    crate::core_types::observability::report_error_or_expected(
                         detail.as_str(),
                         "composio",
                         "trigger_triage",
@@ -537,7 +537,7 @@ impl EventHandler for ComposioConnectionCreatedSubscriber {
                                 .collect();
                             toolkits.sort();
                             toolkits.dedup();
-                            crate::core::event_bus::publish_global(
+                            crate::bridge::events::publish_global(
                                 DomainEvent::ComposioIntegrationsChanged {
                                     toolkits: toolkits.clone(),
                                 },
@@ -777,7 +777,7 @@ impl EventHandler for ComposioConfigChangedSubscriber {
                         .collect();
                     toolkits.sort();
                     toolkits.dedup();
-                    crate::core::event_bus::publish_global(
+                    crate::bridge::events::publish_global(
                         DomainEvent::ComposioIntegrationsChanged {
                             toolkits: toolkits.clone(),
                         },

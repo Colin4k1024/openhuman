@@ -18,7 +18,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use async_trait::async_trait;
 use tokio::sync::watch;
 
-use crate::core::event_bus::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
+use crate::bridge::events::{subscribe_global, DomainEvent, EventHandler, SubscriptionHandle};
 // Arc imported for detector sharing across async tasks
 use crate::learning_full::stability_detector::StabilityDetector;
 

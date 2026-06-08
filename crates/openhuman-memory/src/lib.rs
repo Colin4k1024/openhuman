@@ -14,6 +14,7 @@
 
 pub mod bridge;
 pub mod config;
+pub mod core_types;
 pub mod queue;
 pub mod rpc;
 pub mod store;

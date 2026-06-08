@@ -1,5 +1,5 @@
 use crate::orchestration::Memory;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 use std::fmt::Write;

@@ -1,7 +1,7 @@
 use crate::config::rpc as config_rpc;
 use crate::orchestration::query::backend;
 use crate::tree::retrieval::rpc::FetchLeavesRequest;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 
@@ -75,7 +75,7 @@ mod tests {
     use tempfile::TempDir;
 
     use crate::config::{Config, TEST_ENV_LOCK};
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     struct WorkspaceEnvGuard {

@@ -15,13 +15,13 @@
 
 use crate::config::rpc as config_rpc;
 use crate::config::Config;
-use crate::bridge::inference::provider::traits::{ChatMessage, Provider};
+use crate::bridge::inference::{ChatMessage, ChatProvider as Provider};
 use crate::orchestration::chat::{build_chat_provider, ChatPrompt};
 use crate::store::chunks::types::SourceKind;
 use crate::tree::retrieval;
 use crate::tree::score::extract::EntityKind;
 use crate::tree::tree_runtime::store::{read_children, read_node};
-use crate::bridge::tools::traits::{PermissionLevel, Tool, ToolCategory, ToolResult};
+use crate::bridge::tools::{PermissionLevel, Tool, ToolCategory, ToolResult};
 use async_trait::async_trait;
 use serde_json::json;
 use std::path::{Path, PathBuf};
@@ -1314,7 +1314,7 @@ fn synthesize_fallback(trace: &[SmartWalkStep], evidence: &[Evidence]) -> String
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::inference::provider::traits::ChatMessage;
+    use crate::bridge::inference::ChatMessage;
     use async_trait::async_trait;
     use std::sync::Mutex;
     use tempfile::TempDir;

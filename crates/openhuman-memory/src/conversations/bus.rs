@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use chrono::Utc;
 use serde_json::json;
 
-use crate::core::event_bus::{DomainEvent, EventHandler, SubscriptionHandle};
+use crate::bridge::events::{DomainEvent, EventHandler, SubscriptionHandle};
 use crate::bridge::channels::context::conversation_history_key;
 use crate::bridge::channels::traits::ChannelMessage;
 
@@ -42,7 +42,7 @@ pub fn register_conversation_persistence_subscriber(workspace_dir: PathBuf) {
         return;
     }
 
-    match crate::core::event_bus::subscribe_global(Arc::new(
+    match crate::bridge::events::subscribe_global(Arc::new(
         ConversationPersistenceSubscriber::new_shared(Arc::clone(workspace)),
     )) {
         Some(handle) => {

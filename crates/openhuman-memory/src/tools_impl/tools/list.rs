@@ -6,7 +6,7 @@ use serde_json::json;
 
 use crate::orchestration::ops::helpers::active_memory_client;
 use crate::tools_impl::ToolMemoryStore;
-use crate::bridge::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 
 pub struct MemoryToolsListTool;
 
@@ -66,7 +66,7 @@ mod tests {
     use tempfile::TempDir;
 
     use crate::config::{Config, TEST_ENV_LOCK};
-    use crate::bridge::tools::traits::Tool;
+    use crate::bridge::tools::Tool;
     use serde_json::json;
 
     struct WorkspaceEnvGuard {

@@ -1,5 +1,5 @@
 use super::*;
-use crate::bridge::agent::hooks::{ToolCallRecord, TurnContext};
+use crate::bridge::agent::{ToolCallRecord, TurnContext};
 use crate::orchestration::{Memory, MemoryCategory, MemoryEntry};
 use async_trait::async_trait;
 use parking_lot::Mutex;
@@ -351,7 +351,7 @@ async fn persist_reflection_writes_to_dedicated_namespace_and_category() {
 
 #[tokio::test]
 async fn on_turn_complete_dedupes_reflections_across_heuristic_and_llm_paths() {
-    use crate::bridge::inference::provider::Provider;
+    use crate::bridge::inference::Provider;
     use async_trait::async_trait;
 
     // Stub provider returning a reflection LLM response whose
@@ -549,7 +549,7 @@ async fn on_turn_complete_emits_candidates_to_buffer_for_heuristic_cues() {
 
 #[tokio::test]
 async fn on_turn_complete_emits_style_candidates_from_llm_preferences() {
-    use crate::bridge::inference::provider::Provider;
+    use crate::bridge::inference::Provider;
     use crate::learning_full::candidate::{self, FacetClass};
 
     struct StubPrefProvider;

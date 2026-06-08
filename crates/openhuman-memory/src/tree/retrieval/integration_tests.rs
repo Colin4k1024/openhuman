@@ -14,9 +14,9 @@ use chrono::{TimeZone, Utc};
 use tempfile::TempDir;
 
 use crate::config::Config;
-use crate::openhuman::memory::ingest_pipeline::ingest_chat;
+use crate::orchestration::ingest_pipeline::ingest_chat;
 use crate::store::chunks::types::SourceKind;
-use crate::openhuman::memory_sync::canonicalize::chat::{ChatBatch, ChatMessage};
+use crate::sync::canonicalize::chat::{ChatBatch, ChatMessage};
 use crate::tree::retrieval::{
     drill_down, fetch_leaves, query_source, search_entities,
 };
@@ -156,7 +156,7 @@ async fn ingest_populates_chunk_embeddings() {
 #[tokio::test]
 async fn seal_populates_summary_embedding() {
     use crate::bridge::inference::{test_override, ChatProvider, StaticChatProvider};
-    use crate::openhuman::memory::tree_source::registry::get_or_create_source_tree;
+    use crate::orchestration::tree_source::registry::get_or_create_source_tree;
     use crate::store::chunks::store::upsert_chunks;
     use crate::store::chunks::types::{
         chunk_id, Chunk, Metadata, SourceKind, SourceRef,

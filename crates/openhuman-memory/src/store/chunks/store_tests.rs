@@ -318,7 +318,7 @@ fn delete_chunks_by_source_removes_chunks_side_rows_and_ingest_gate() {
 /// in pending). Mocked connection (tempdir), chunks, tree/summary/buffer, job.
 #[tokio::test]
 async fn clear_memory_delete_cascades_orphaned_source_tree_and_settles_queued_job() {
-    use crate::openhuman::memory_queue::{store as queue_store, types as queue_types};
+    use crate::queue::{store as queue_store, types as queue_types};
     use crate::store::trees::store as tree_store;
     use crate::store::trees::types::{
         Buffer, SummaryNode, Tree, TreeKind, TreeStatus,
@@ -514,7 +514,7 @@ async fn clear_memory_delete_cascades_orphaned_source_tree_and_settles_queued_jo
         .unwrap()
         .expect("seal job claimable");
     assert_eq!(claimed.kind, queue_types::JobKind::Seal);
-    let outcome = crate::openhuman::memory_queue::handlers::handle_job(&cfg, &claimed)
+    let outcome = crate::queue::handlers::handle_job(&cfg, &claimed)
         .await
         .expect("handle_job ok");
     assert!(
@@ -703,7 +703,7 @@ fn clear_memory_delete_keeps_tree_when_another_connection_still_owns_chunks() {
 /// out from under them settle to `Done` (warn-and-skip), not stuck pending.
 #[tokio::test]
 async fn queued_jobs_for_deleted_chunk_settle_to_done() {
-    use crate::openhuman::memory_queue::{store as queue_store, types as queue_types};
+    use crate::queue::{store as queue_store, types as queue_types};
 
     let (_tmp, cfg) = test_config();
     let c = sample_chunk("slack:#eng", 0, 1_700_000_000_000);
@@ -737,7 +737,7 @@ async fn queued_jobs_for_deleted_chunk_settle_to_done() {
         let job = queue_store::claim_next(&cfg, queue_store::DEFAULT_LOCK_DURATION_MS)
             .unwrap()
             .expect("job claimable");
-        let outcome = crate::openhuman::memory_queue::handlers::handle_job(&cfg, &job)
+        let outcome = crate::queue::handlers::handle_job(&cfg, &job)
             .await
             .expect("handle_job ok");
         assert!(

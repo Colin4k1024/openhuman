@@ -3,10 +3,10 @@
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
-use crate::bridge::composio::client::{
+use crate::bridge::composio::{
     create_composio_client, direct_execute, ComposioClient, ComposioClientKind,
 };
-use crate::bridge::composio::types::ComposioExecuteResponse;
+use crate::bridge::composio::ComposioExecuteResponse;
 use crate::config::rpc as config_rpc;
 use crate::config::Config;
 

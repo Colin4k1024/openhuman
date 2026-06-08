@@ -4,7 +4,7 @@
 //! total calls, successes, failures, and average duration. Stored in the
 //! `tool_effectiveness` memory category keyed by `tool/{name}`.
 
-use crate::bridge::agent::hooks::{PostTurnHook, TurnContext};
+use crate::bridge::agent::{PostTurnHook, TurnContext};
 use crate::config::LearningConfig;
 use crate::orchestration::{Memory, MemoryCategory};
 use async_trait::async_trait;
@@ -179,7 +179,7 @@ impl PostTurnHook for ToolTrackerHook {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::agent::hooks::{ToolCallRecord, TurnContext};
+    use crate::bridge::agent::{ToolCallRecord, TurnContext};
     use crate::orchestration::{Memory, MemoryCategory, MemoryEntry};
     use async_trait::async_trait;
     use parking_lot::Mutex;

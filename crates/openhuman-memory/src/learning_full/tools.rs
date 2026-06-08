@@ -24,7 +24,7 @@ use crate::config::rpc as config_rpc;
 use crate::learning_full::cache::FacetCache;
 use crate::learning_full::stability_detector::StabilityDetector;
 use crate::store::profile::{FacetState, ProfileFacet, UserState};
-use crate::bridge::tools::traits::{PermissionLevel, Tool, ToolResult};
+use crate::bridge::tools::{PermissionLevel, Tool, ToolResult};
 
 /// Acquire the profile facet cache, mirroring `learning::schemas::get_cache`.
 fn get_cache() -> anyhow::Result<FacetCache> {
@@ -612,7 +612,7 @@ impl Tool for LearningEnrichProfileTool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bridge::tools::traits::ToolScope;
+    use crate::bridge::tools::ToolScope;
 
     #[test]
     fn names_and_levels() {

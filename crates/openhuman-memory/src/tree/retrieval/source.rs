@@ -308,7 +308,7 @@ fn filter_by_window(hits: Vec<RetrievalHit>, window_days: u32) -> Vec<RetrievalH
 mod tests {
     use super::*;
     use crate::bridge::inference::{test_override, ChatProvider, StaticChatProvider};
-    use crate::openhuman::memory::tree_source::registry::get_or_create_source_tree;
+    use crate::orchestration::tree_source::registry::get_or_create_source_tree;
     use crate::store::chunks::store::upsert_chunks;
     use crate::store::chunks::types::{
         chunk_id, Chunk, Metadata, SourceKind, SourceRef,
