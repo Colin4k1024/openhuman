@@ -6,11 +6,23 @@ use async_trait::async_trait;
 
 /// Fired when the memory system produces observable events.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum MemoryEvent {
     IngestionStarted { source: String },
     IngestionCompleted { source: String, chunks: usize },
     EmbeddingModelUnhealthy { provider: String, error: String },
     HealthChanged { component: String, healthy: bool, message: Option<String> },
+    MemoryTreeBuildProgress {
+        tree_scope: String,
+        phase: String,
+        step: String,
+        detail: String,
+        item_count: Option<u32>,
+        level: Option<u32>,
+    },
+    TreeSummarizerHourCompleted { namespace: String, node_id: String, token_count: u32 },
+    TreeSummarizerPropagated { namespace: String, level: u32, node_id: String, token_count: u32 },
+    TreeSummarizerRebuildCompleted { namespace: String, total_nodes: u32 },
 }
 
 /// Trait for publishing memory events to the broader application.

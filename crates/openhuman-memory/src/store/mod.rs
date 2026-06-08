@@ -6,16 +6,13 @@
 
 pub mod chunks;
 pub mod content;
-#[cfg(feature = "__full_app")]
 pub mod entities;
-#[cfg(feature = "__full_app")]
 pub mod kinds;
 pub mod kv;
 #[cfg(feature = "__full_app")]
 pub mod retrieval;
 pub mod safety;
 pub mod traits;
-#[cfg(feature = "__full_app")]
 pub mod trees;
 pub mod types;
 pub mod unified;
@@ -32,7 +29,6 @@ pub mod factories;
 #[cfg(feature = "__full_app")]
 mod memory_trait;
 
-#[cfg(feature = "__full_app")]
 pub use kinds::MemoryKind;
 pub use traits::{ObsidianFile, ObsidianRepresentable, VectorEmbeddable};
 

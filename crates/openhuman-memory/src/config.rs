@@ -73,6 +73,65 @@ pub struct EmbeddingRouteConfig {
     pub dimensions: Option<usize>,
 }
 
+/// Memory tree configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct MemoryTreeConfig {
+    /// Max concurrent summarization tasks.
+    pub max_concurrent_summarize: usize,
+    /// Enable/disable tree engine.
+    pub enabled: bool,
+    /// Cloud summarization opt-in.
+    pub cloud_summarization_opt_in: bool,
+    /// Custom embedding endpoint.
+    pub embedding_endpoint: Option<String>,
+}
+
+/// Secrets configuration (API keys, tokens).
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SecretsConfig {
+    pub openai_api_key: Option<String>,
+    pub anthropic_api_key: Option<String>,
+    pub cohere_api_key: Option<String>,
+    pub voyage_api_key: Option<String>,
+}
+
+/// Local AI configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct LocalAiConfig {
+    pub ollama_base_url: Option<String>,
+    pub default_model: Option<String>,
+    pub chat_model_id: String,
+    pub runtime_enabled: bool,
+}
+
+/// Scheduler gate mode.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SchedulerGateMode {
+    #[default]
+    Off,
+    On,
+    Throttled,
+}
+
+/// Scheduler gate configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SchedulerGateConfig {
+    pub enabled: bool,
+    pub mode: SchedulerGateMode,
+}
+
+/// Reliability tuning.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ReliabilityConfig {
+    pub max_retries: u32,
+    pub timeout_secs: u64,
+}
+
 /// Top-level config struct that the memory store expects.
 ///
 /// In the full OpenHuman app, this is constructed from the main `Config`.
@@ -81,10 +140,21 @@ pub struct EmbeddingRouteConfig {
 #[serde(default)]
 pub struct Config {
     pub memory: MemoryConfig,
+    pub memory_tree: MemoryTreeConfig,
     pub storage: StorageConfig,
     pub embedding_routes: Vec<EmbeddingRouteConfig>,
+    pub secrets: SecretsConfig,
+    pub local_ai: LocalAiConfig,
+    pub scheduler_gate: SchedulerGateConfig,
+    pub reliability: ReliabilityConfig,
     /// Workspace root directory (where DBs and raw files live).
     pub workspace_dir: PathBuf,
+    /// Default LLM model for summarization etc.
+    pub default_model: Option<String>,
+    /// Output language for LLM-generated content.
+    pub output_language: Option<String>,
+    /// Embedding provider name.
+    pub embeddings_provider: Option<String>,
 }
 
 impl Default for Config {
@@ -92,9 +162,17 @@ impl Default for Config {
         let data_dir = default_data_dir();
         Self {
             memory: MemoryConfig::default(),
+            memory_tree: MemoryTreeConfig::default(),
             storage: StorageConfig::default(),
             embedding_routes: Vec::new(),
+            secrets: SecretsConfig::default(),
+            local_ai: LocalAiConfig::default(),
+            scheduler_gate: SchedulerGateConfig::default(),
+            reliability: ReliabilityConfig::default(),
             workspace_dir: data_dir,
+            default_model: None,
+            output_language: None,
+            embeddings_provider: None,
         }
     }
 }
@@ -162,4 +240,24 @@ pub mod rpc {
 /// Returns the default root directory for OpenHuman data.
 pub fn default_root_openhuman_dir() -> PathBuf {
     default_data_dir()
+}
+
+/// Default Ollama base URL.
+pub const OLLAMA_BASE_URL: &str = "http://127.0.0.1:11434";
+
+/// Get the configured Ollama base URL.
+pub fn ollama_base_url(config: &Config) -> String {
+    config
+        .local_ai
+        .ollama_base_url
+        .clone()
+        .unwrap_or_else(|| OLLAMA_BASE_URL.to_string())
+}
+
+/// Build a language directive string for LLM prompts.
+pub fn output_language_directive(output_language: Option<&str>) -> Option<String> {
+    match output_language {
+        Some(lang) if !lang.is_empty() => Some(format!("Respond in {}.", lang)),
+        _ => None,
+    }
 }
