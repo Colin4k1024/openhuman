@@ -123,6 +123,23 @@ pub trait ChatProvider: Send + Sync {
         Ok(resp.content)
     }
 
+    /// Chat with message history (used by query/walk).
+    async fn chat_with_history(
+        &self,
+        messages: &[ChatMessage],
+        model: &str,
+        temperature: f64,
+    ) -> anyhow::Result<String> {
+        let prompt = ChatPrompt {
+            messages: messages.to_vec(),
+            model: model.to_string(),
+            temperature,
+            ..Default::default()
+        };
+        let resp = self.complete_chat(&prompt).await?;
+        Ok(resp.content)
+    }
+
     /// Chat returning text + usage info (used by summarise).
     async fn chat_for_text_with_usage(
         &self,
@@ -155,6 +172,9 @@ impl ChatProvider for StaticChatProvider {
         })
     }
 }
+
+/// Alias for the ChatProvider trait (used in code that references `Provider`).
+pub use ChatProvider as Provider;
 
 /// Build a chat runtime from config (placeholder — full app provides real impl).
 pub fn build_chat_runtime(

@@ -87,6 +87,22 @@ pub async fn direct_execute(
     anyhow::bail!("composio execute not available in standalone mode")
 }
 
+/// Response from a composio execute call.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ComposioExecuteResponse {
+    pub success: bool,
+    pub data: serde_json::Value,
+}
+
+/// Composio ops stubs.
+pub mod ops {
+    pub async fn fetch_connected_integrations(
+        _config: &crate::config::Config,
+    ) -> anyhow::Result<super::FetchConnectedIntegrationsStatus> {
+        Ok(super::FetchConnectedIntegrationsStatus::default())
+    }
+}
+
 /// Profile.md managed-block helpers.
 pub mod profile_md {
     /// Start marker for a managed block.

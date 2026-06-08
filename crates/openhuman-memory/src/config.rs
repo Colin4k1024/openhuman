@@ -260,6 +260,11 @@ pub mod rpc {
     pub fn config() -> Arc<Config> {
         get_config()
     }
+
+    /// Reload config snapshot (async stub).
+    pub async fn reload_config_snapshot_with_timeout() -> Result<Arc<Config>, String> {
+        Ok(get_config())
+    }
 }
 
 /// Returns the default root directory for OpenHuman data.

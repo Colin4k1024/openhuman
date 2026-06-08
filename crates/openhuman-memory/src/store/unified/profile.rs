@@ -19,7 +19,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::learning::candidate::EvidenceRef;
+#[cfg(feature = "__full_app")]
+use crate::learning_full::candidate::EvidenceRef;
+#[cfg(not(feature = "__full_app"))]
+type EvidenceRef = String;
 
 /// SQL to create the user_profile table. Called during UnifiedMemory init.
 pub const PROFILE_INIT_SQL: &str = r#"

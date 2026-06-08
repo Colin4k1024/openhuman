@@ -75,3 +75,14 @@ pub enum ToolCallFormat {
 pub trait PromptContextProvider: Send + Sync {
     fn sections(&self) -> Vec<PromptSection>;
 }
+
+/// Prompt module stubs.
+pub mod prompt {
+    pub use super::{LearnedContextData, PromptSection, ToolCallFormat};
+
+    /// Prompt context container.
+    #[derive(Clone, Debug, Default)]
+    pub struct PromptContext {
+        pub sections: Vec<PromptSection>,
+    }
+}

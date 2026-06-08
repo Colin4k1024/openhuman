@@ -12,8 +12,12 @@ pub mod preferences;
 pub mod query;
 pub mod remember;
 pub mod sync;
-pub mod tools_rpc;
 pub mod traits;
 pub mod tree_policy;
 pub mod tree_source;
 pub mod util;
+
+// tools_rpc needs its own mod.rs
+// pub mod tools_rpc;
+
+pub use traits::{Memory, MemoryCategory, MemoryEntry, MemoryTaint, NamespaceSummary, RecallOpts};

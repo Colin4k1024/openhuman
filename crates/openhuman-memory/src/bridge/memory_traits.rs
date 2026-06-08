@@ -37,3 +37,17 @@ impl Default for MemoryTaint {
         Self::Internal
     }
 }
+
+/// Placeholder Memory trait (the real one lives in orchestration::traits when __full_app).
+#[cfg(feature = "__full_app")]
+pub use crate::orchestration::traits::Memory;
+
+/// Ingestion queue placeholder.
+pub mod ingestion {
+    /// Queue control for ingestion (stub).
+    pub mod queue {
+        pub fn pause() {}
+        pub fn resume() {}
+        pub fn is_paused() -> bool { false }
+    }
+}
