@@ -37,7 +37,7 @@ pub struct MemoryState(pub std::sync::Mutex<Option<MemoryClientRef>>);
 /// Embedding generation is delegated to whichever provider the
 /// [`MemoryConfig.embedding_provider`](crate::config::MemoryConfig)
 /// resolves to — cloud (OpenHuman backend, the default returned by
-/// [`crate::embeddings::default_embedding_provider`]) or local Ollama
+/// [`crate::embedding_ext::default_embedding_provider`]) or local Ollama
 /// when explicitly opted into. The cloud embedder resolves its session JWT
 /// lazily, so an unauthenticated session will surface as a clear error on the
 /// first `embed` call rather than at client construction.
@@ -110,7 +110,7 @@ impl MemoryClient {
         // Ollama path should build their memory store via
         // `create_memory_with_local_ai` with the appropriate
         // `MemoryConfig.embedding_provider`.
-        let embedder: Arc<dyn EmbeddingProvider> = embeddings::default_embedding_provider();
+        let embedder: Arc<dyn EmbeddingProvider> = crate::embedding_ext::default_embedding_provider();
 
         // Create the underlying UnifiedMemory instance.
         let memory =

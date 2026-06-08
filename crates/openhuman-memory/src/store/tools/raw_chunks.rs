@@ -11,7 +11,7 @@ use serde_json::json;
 use crate::config::rpc as config_rpc;
 use crate::store::chunks::store::{list_chunks, ListChunksQuery};
 use crate::store::chunks::types::SourceKind;
-use crate::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 
 pub struct MemoryStoreRawChunksTool;
 

@@ -38,16 +38,65 @@ impl Default for MemoryTaint {
     }
 }
 
-/// Placeholder Memory trait (the real one lives in orchestration::traits when __full_app).
+/// Re-export Memory and related traits from orchestration when available.
 #[cfg(feature = "__full_app")]
-pub use crate::orchestration::traits::Memory;
+pub use crate::orchestration::traits::{Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts};
 
-/// Ingestion queue placeholder.
+/// Ingestion types and queue control.
 pub mod ingestion {
-    /// Queue control for ingestion (stub).
+    use serde::{Deserialize, Serialize};
+
+    /// Ingestion job state.
+    #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+    pub enum IngestionState {
+        #[default]
+        Idle,
+        Running,
+        Completed,
+        Failed(String),
+    }
+
+    /// Ingestion job descriptor.
+    #[derive(Clone, Debug, Default)]
+    pub struct IngestionJob {
+        pub id: String,
+        pub source: String,
+        pub state: IngestionState,
+    }
+
+    /// Ingestion queue handle.
+    #[derive(Clone, Debug, Default)]
+    pub struct IngestionQueue;
+
+    /// Ingestion config.
+    #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+    pub struct MemoryIngestionConfig {
+        pub enabled: bool,
+    }
+
+    /// Ingestion request.
+    #[derive(Clone, Debug)]
+    pub struct MemoryIngestionRequest {
+        pub source: String,
+        pub content: String,
+    }
+
+    /// Ingestion result.
+    #[derive(Clone, Debug, Default)]
+    pub struct MemoryIngestionResult {
+        pub chunks_created: u32,
+    }
+
+    /// Queue control submodule.
     pub mod queue {
         pub fn pause() {}
         pub fn resume() {}
         pub fn is_paused() -> bool { false }
+        pub fn start_worker_with_state(_config: &crate::config::Config) {}
     }
+
+    pub fn pause() {}
+    pub fn resume() {}
+    pub fn is_paused() -> bool { false }
+    pub fn start_worker_with_state(_config: &crate::config::Config) {}
 }

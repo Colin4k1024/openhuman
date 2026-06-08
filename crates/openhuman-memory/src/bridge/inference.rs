@@ -176,6 +176,46 @@ impl ChatProvider for StaticChatProvider {
 /// Alias for the ChatProvider trait (used in code that references `Provider`).
 pub use ChatProvider as Provider;
 
+/// Chat request (legacy type alias).
+pub type ChatRequest = ChatPrompt;
+
+/// Create a chat provider for a specific role (stub).
+pub fn provider_for_role(
+    _role: &str,
+    _config: &crate::config::Config,
+) -> anyhow::Result<Box<dyn ChatProvider>> {
+    anyhow::bail!("provider_for_role not available in standalone mode")
+}
+
+/// Create a chat provider (stub).
+pub fn create_chat_provider(
+    _config: &crate::config::Config,
+) -> anyhow::Result<Box<dyn ChatProvider>> {
+    anyhow::bail!("create_chat_provider not available in standalone mode")
+}
+
+/// Inference ops stubs.
+pub mod ops {
+    pub fn current_model() -> String {
+        "default".to_string()
+    }
+
+    /// Provider runtime options.
+    #[derive(Clone, Debug, Default)]
+    pub struct ProviderRuntimeOptions {
+        pub model: Option<String>,
+        pub temperature: Option<f64>,
+    }
+
+    /// Create a backend inference provider (stub).
+    pub fn create_backend_inference_provider(
+        _config: &crate::config::Config,
+        _opts: &ProviderRuntimeOptions,
+    ) -> anyhow::Result<Box<dyn super::ChatProvider>> {
+        anyhow::bail!("backend inference provider not available in standalone mode")
+    }
+}
+
 /// Build a chat runtime from config (placeholder — full app provides real impl).
 pub fn build_chat_runtime(
     _config: &crate::config::Config,

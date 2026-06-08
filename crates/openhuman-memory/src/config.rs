@@ -166,6 +166,8 @@ pub struct Config {
     pub output_language: Option<String>,
     /// Embedding provider name.
     pub embeddings_provider: Option<String>,
+    /// Memory sources configuration.
+    pub memory_sources: serde_json::Value,
     /// Learning configuration.
     pub learning: LearningConfig,
 }
@@ -187,6 +189,7 @@ impl Default for Config {
             output_language: None,
             embeddings_provider: None,
             learning: LearningConfig::default(),
+            memory_sources: serde_json::Value::Null,
         }
     }
 }
@@ -270,6 +273,35 @@ pub mod rpc {
 /// Returns the default root directory for OpenHuman data.
 pub fn default_root_openhuman_dir() -> PathBuf {
     default_data_dir()
+}
+
+/// Default cloud LLM model.
+pub const DEFAULT_CLOUD_LLM_MODEL: &str = "claude-3-haiku-20240307";
+
+/// Reflection source configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub enum ReflectionSource {
+    #[default]
+    Cloud,
+    Local,
+}
+
+/// Config schema stubs.
+pub mod schema {
+    pub use super::*;
+
+    /// Composio mode constant.
+    pub const COMPOSIO_MODE_DIRECT: &str = "direct";
+}
+
+/// Config ops stubs.
+pub mod ops {
+    pub use super::rpc::{get_config, load_config_with_timeout};
+}
+
+/// Global config accessor.
+pub fn global() -> std::sync::Arc<Config> {
+    rpc::get_config()
 }
 
 /// Default Ollama base URL.

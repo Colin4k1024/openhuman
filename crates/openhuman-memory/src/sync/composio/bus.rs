@@ -650,7 +650,7 @@ enum WaitError {
 /// On success returns the observed status string. On timeout returns
 /// the last status we saw (helpful for "stuck in INITIATED" debugging).
 async fn wait_for_connection_active(
-    client: &ComposioClient,
+    client: &dyn crate::bridge::composio::ComposioClient,
     connection_id: &str,
 ) -> Result<String, WaitError> {
     let started = std::time::Instant::now();

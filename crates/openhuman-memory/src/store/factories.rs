@@ -14,9 +14,10 @@ use std::sync::Arc;
 
 use crate::config::{EmbeddingRouteConfig, MemoryConfig, StorageProviderConfig};
 use crate::embeddings::{
-    self, format_embedding_signature, EmbeddingProvider, DEFAULT_CLOUD_EMBEDDING_DIMENSIONS,
-    DEFAULT_CLOUD_EMBEDDING_MODEL, DEFAULT_OLLAMA_DIMENSIONS, DEFAULT_OLLAMA_MODEL,
+    self, format_embedding_signature, EmbeddingProvider,
+    DEFAULT_OLLAMA_DIMENSIONS, DEFAULT_OLLAMA_MODEL,
 };
+use crate::embedding_ext::{DEFAULT_CLOUD_EMBEDDING_DIMENSIONS, DEFAULT_CLOUD_EMBEDDING_MODEL};
 use crate::bridge::memory_traits::Memory;
 use crate::store::unified::UnifiedMemory;
 
@@ -58,7 +59,7 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     // and produced TAURI-RUST-B (~409 events). The `&str` input avoids
     // the `format!("{:#}")` round-trip that `report_error` would do on an
     // anyhow chain — the wire shape stays bit-identical.
-    tracing::warn(
+    tracing::warn!(
         sentry_message.as_str(),
         "memory",
         "ollama_health_gate",
@@ -415,7 +416,7 @@ fn create_memory_full(
 
     // 3. Create the embedding provider.
     let embedder: Arc<dyn EmbeddingProvider> = Arc::from(
-        embeddings::create_embedding_provider(&provider, &model, dims).inspect_err(|err| {
+        crate::embedding_ext::create_embedding_provider(&provider, &model, dims).inspect_err(|err| {
             log::warn!(
                 "[memory::factory] create_embedding_provider failed provider={provider} model={model} dims={dims}: {err}",
             );
@@ -565,7 +566,7 @@ mod tests {
         for local in [None, Some("nomic-embed-text:latest"), Some("bge-m3")] {
             let mem = MemoryConfig::default();
             let (provider, model, dims) = effective_embedding_settings(&mem, local);
-            let live = embeddings::create_embedding_provider(&provider, &model, dims)
+            let live = crate::embedding_ext::create_embedding_provider(&provider, &model, dims)
                 .expect("provider builds for test triple");
             assert_eq!(
                 active_embedding_signature(&mem, local),

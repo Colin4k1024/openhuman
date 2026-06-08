@@ -47,3 +47,47 @@ pub mod learning;
 // Re-export foundational crates
 pub use openhuman_embeddings as embeddings;
 pub use openhuman_memory_types as types;
+
+/// Embedding extensions (factory functions not in the base embeddings crate).
+pub mod embedding_ext {
+    use crate::config::Config;
+
+    pub const DEFAULT_CLOUD_EMBEDDING_MODEL: &str = "text-embedding-3-small";
+    pub const DEFAULT_CLOUD_EMBEDDING_DIMENSIONS: usize = 1536;
+
+    /// Resolve API key for an embedding provider (stub).
+    pub fn resolve_api_key(_config: &Config, _provider: &str) -> Option<String> {
+        None
+    }
+
+    /// Create embedding provider (stub).
+    pub fn create_embedding_provider(
+        _config: &Config,
+    ) -> anyhow::Result<Box<dyn openhuman_embeddings::EmbeddingProvider>> {
+        anyhow::bail!("create_embedding_provider not available standalone")
+    }
+
+    /// Create embedding provider with credentials (stub).
+    pub fn create_embedding_provider_with_credentials(
+        _provider: &str,
+        _model: &str,
+        _dims: usize,
+        _base_url: Option<&str>,
+        _api_key: Option<&str>,
+    ) -> anyhow::Result<Box<dyn openhuman_embeddings::EmbeddingProvider>> {
+        anyhow::bail!("create_embedding_provider_with_credentials not available standalone")
+    }
+
+    /// Default embedding provider name.
+    pub fn default_embedding_provider() -> String {
+        "cloud".to_string()
+    }
+
+    /// Cloud module stub.
+    pub mod cloud {
+        pub use super::DEFAULT_CLOUD_EMBEDDING_DIMENSIONS;
+        pub use super::DEFAULT_CLOUD_EMBEDDING_MODEL;
+
+        pub struct OpenHumanCloudEmbedding;
+    }
+}

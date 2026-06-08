@@ -21,7 +21,7 @@ use async_trait::async_trait;
 
 use super::{Embedder, EMBEDDING_DIM};
 use crate::config::Config;
-use crate::embeddings::cloud::{
+use crate::embedding_ext::cloud::{
     OpenHumanCloudEmbedding, DEFAULT_CLOUD_EMBEDDING_DIMENSIONS, DEFAULT_CLOUD_EMBEDDING_MODEL,
 };
 use crate::embeddings::EmbeddingProvider;

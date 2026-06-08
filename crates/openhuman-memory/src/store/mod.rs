@@ -31,6 +31,10 @@ mod memory_trait;
 
 pub use kinds::MemoryKind;
 pub use traits::{ObsidianFile, ObsidianRepresentable, VectorEmbeddable};
+pub use types::{
+    GraphRelationRecord, MemoryItemKind, NamespaceDocumentInput, NamespaceMemoryHit,
+    NamespaceRetrievalContext,
+};
 pub use unified::profile;
 pub use unified::UnifiedMemory;
 

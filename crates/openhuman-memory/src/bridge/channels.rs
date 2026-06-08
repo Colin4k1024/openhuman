@@ -19,3 +19,13 @@ pub struct ChannelMessage {
 pub fn conversation_history_key(channel_type: &str, channel_id: &str) -> String {
     format!("conversation_history:{}:{}", channel_type, channel_id)
 }
+
+/// Context module stub.
+pub mod context {
+    pub use super::conversation_history_key;
+}
+
+/// Traits module stub.
+pub mod traits {
+    pub use super::ChannelMessage;
+}

@@ -13,7 +13,7 @@ use serde_json::json;
 use crate::config::rpc as config_rpc;
 use crate::tree::retrieval::search::search_entities;
 use crate::tree::score::extract::EntityKind;
-use crate::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 
 pub struct MemoryStoreRawSearchTool;
 

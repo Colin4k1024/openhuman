@@ -1,54 +1,74 @@
-//! Core transport types (minimal stubs for standalone compilation).
-//!
-//! In the full app, these are provided by `src/core/types.rs` and `src/core/all.rs`.
+//! Core transport types (mirrors src/core/ types for standalone compilation).
 
-use serde_json::Value;
+use serde::Serialize;
+use serde_json::{Map, Value};
 use std::future::Future;
 use std::pin::Pin;
 
 /// Future returned by controller handlers.
-pub type ControllerFuture =
-    Pin<Box<dyn Future<Output = Result<Value, String>> + Send>>;
+pub type ControllerFuture = Pin<Box<dyn Future<Output = Result<Value, String>> + Send + 'static>>;
+
+/// Handler function type.
+pub type ControllerHandler = fn(Map<String, Value>) -> ControllerFuture;
 
 /// A registered controller entry.
 pub struct RegisteredController {
-    pub namespace: &'static str,
-    pub name: &'static str,
-    pub handler: fn(Value) -> ControllerFuture,
+    pub schema: ControllerSchema,
+    pub handler: ControllerHandler,
+}
+
+impl RegisteredController {
+    pub fn rpc_method_name(&self) -> String {
+        format!("openhuman.{}_{}", self.schema.namespace, self.schema.function)
+    }
 }
 
 /// Schema for a controller.
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ControllerSchema {
-    pub namespace: String,
-    pub name: String,
-    pub description: String,
-    pub fields: Vec<FieldSchema>,
+    pub namespace: &'static str,
+    pub function: &'static str,
+    pub description: &'static str,
+    pub inputs: Vec<FieldSchema>,
+    pub outputs: Vec<FieldSchema>,
+}
+
+impl ControllerSchema {
+    pub fn method_name(&self) -> String {
+        format!("{}.{}", self.namespace, self.function)
+    }
 }
 
 /// Schema for a field.
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FieldSchema {
-    pub name: String,
-    pub description: String,
-    pub type_schema: TypeSchema,
+    pub name: &'static str,
+    pub ty: TypeSchema,
+    pub comment: &'static str,
     pub required: bool,
 }
 
 /// Schema for a type.
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum TypeSchema {
+    Bool,
+    I64,
+    U64,
+    F64,
     String,
-    Number,
-    Boolean,
-    Object,
+    Json,
+    Bytes,
     Array(Box<TypeSchema>),
-    Optional(Box<TypeSchema>),
+    Map(Box<TypeSchema>),
+    Option(Box<TypeSchema>),
+    Enum { variants: Vec<&'static str> },
+    Object { fields: Vec<FieldSchema> },
+    Ref(&'static str),
 }
 
 /// Namespace for controller registration.
 pub mod all {
-    pub use super::{ControllerFuture, RegisteredController};
+    pub use super::{ControllerFuture, ControllerHandler, RegisteredController};
 }
 
 /// Logging helpers (stubs).
@@ -69,4 +89,10 @@ pub mod shutdown {
 /// Observability helpers (stubs).
 pub mod observability {
     pub fn report_error(_msg: &str) {}
+    pub fn report_error_or_expected(_msg: &str, _expected: bool) {}
+}
+
+/// Event bus compat (remaining references).
+pub mod event_bus {
+    pub use crate::bridge::events::*;
 }

@@ -1,5 +1,17 @@
 //! Utility functions for the tree module.
 
+/// Ceil char boundary — find the smallest index ≥ `min` that is a valid char boundary.
+pub fn ceil_char_boundary(s: &str, min: usize) -> usize {
+    if min >= s.len() {
+        return s.len();
+    }
+    let mut i = min;
+    while i < s.len() && !s.is_char_boundary(i) {
+        i += 1;
+    }
+    i
+}
+
 /// Floor char boundary — find the largest index ≤ `max` that is a valid char boundary.
 pub fn floor_char_boundary(s: &str, max: usize) -> usize {
     if max >= s.len() {

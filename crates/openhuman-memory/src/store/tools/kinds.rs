@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use serde_json::{json, Value};
 
 use crate::store::MemoryKind;
-use crate::tools::traits::{Tool, ToolResult};
+use crate::bridge::tools::{Tool, ToolResult};
 
 pub struct MemoryStoreKindsTool;
 

@@ -633,7 +633,7 @@ async fn search_gmail_for_linkedin(config: &Config) -> anyhow::Result<Option<Str
 /// Call the Apify LinkedIn profile scraper synchronously and return the
 /// first profile item from the dataset.
 pub async fn scrape_linkedin_profile(
-    client: &Arc<IntegrationClient>,
+    client: &Arc<dyn IntegrationClient>,
     profile_url: &str,
 ) -> anyhow::Result<serde_json::Value> {
     let body = json!({

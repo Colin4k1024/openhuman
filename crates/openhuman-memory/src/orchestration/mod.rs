@@ -6,6 +6,13 @@
 
 pub mod chat;
 pub mod global;
+pub mod ops;
+pub mod rpc_models;
+
+pub use rpc_models::*;
+pub use crate::bridge::memory_traits::ingestion::{
+    MemoryIngestionConfig, MemoryIngestionRequest, MemoryIngestionResult,
+};
 pub mod ingest_pipeline;
 pub mod ingestion;
 pub mod preferences;

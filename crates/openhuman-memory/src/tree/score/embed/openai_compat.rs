@@ -64,10 +64,10 @@ impl OpenAiCompatEmbedder {
         };
 
         let model = config.memory.embedding_model.trim();
-        let api_key = crate::embeddings::resolve_api_key(config, provider);
+        let api_key = crate::embedding_ext::resolve_api_key(config, provider);
         let custom_endpoint = provider.strip_prefix("custom:");
 
-        let inner = crate::embeddings::create_embedding_provider_with_credentials(
+        let inner = crate::embedding_ext::create_embedding_provider_with_credentials(
             slug,
             model,
             EMBEDDING_DIM,

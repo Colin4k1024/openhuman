@@ -23,12 +23,20 @@ impl ToolResult {
         }
     }
 
+    pub fn success(output: impl Into<String>) -> Self {
+        Self::ok(output)
+    }
+
     pub fn err(output: impl Into<String>) -> Self {
         Self {
             success: false,
             output: output.into(),
             metadata: None,
         }
+    }
+
+    pub fn error(output: impl Into<String>) -> Self {
+        Self::err(output)
     }
 }
 
@@ -64,20 +72,25 @@ pub trait Tool: Send + Sync {
     fn parameters_schema(&self) -> Value;
 
     /// Execute the tool with the given arguments.
-    async fn execute(&self, args: Value) -> ToolResult;
+    async fn execute(&self, args: Value) -> anyhow::Result<ToolResult>;
 
     /// Permission level required.
     fn permission_level(&self) -> PermissionLevel {
         PermissionLevel::ReadOnly
     }
 
-    /// Whether this tool can be called concurrently.
-    fn is_concurrency_safe(&self) -> bool {
+    /// Whether this tool can be called concurrently with given args.
+    fn is_concurrency_safe(&self, _args: &Value) -> bool {
         true
     }
 
     /// Tool category.
     fn category(&self) -> ToolCategory {
         ToolCategory::General
+    }
+
+    /// Whether this tool has external effects.
+    fn external_effect(&self) -> bool {
+        false
     }
 }

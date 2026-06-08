@@ -20,53 +20,54 @@ use std::sync::Arc;
 /// Sync paths that ingest text from third-party services (Gmail / Slack /
 /// Notion / Composio / etc.) MUST flip this to [`MemoryTaint::ExternalSync`]
 /// at write time so the subconscious origin escalation can see it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
-#[serde(rename_all = "snake_case")]
-pub enum MemoryTaint {
-    /// User-driven memory (chat, manual remember, internal heuristics).
-    #[default]
-    Internal,
-    /// Chunk ingested from an external sync source (Gmail / Slack /
-    /// Notion / Composio / etc.). Subconscious turns whose context
-    /// contains any tainted chunk MUST run with
-    /// [`TrustedAutomationSource::SubconsciousTainted`] origin so
-    /// external_effect tools are refused.
-    ///
-    /// [`TrustedAutomationSource::SubconsciousTainted`]:
-    /// crate::bridge::agent::turn_origin::TrustedAutomationSource::SubconsciousTainted
-    ExternalSync,
-}
+pub use crate::bridge::memory_traits::MemoryTaint;
 
-impl MemoryTaint {
-    /// Serialised form used by the SQLite `memory_docs.taint` column.
-    ///
-    /// Kept short + snake_case to match the serde representation and to
-    /// keep the on-disk footprint minimal. Round-trips via
-    /// [`Self::from_db_str`].
-    pub fn as_db_str(&self) -> &'static str {
-        match self {
-            Self::Internal => "internal",
-            Self::ExternalSync => "external_sync",
-        }
-    }
 
-    /// Reverse of [`Self::as_db_str`]. Unknown values (a forward-rolled
-    /// schema variant we don't know about yet, a manual `UPDATE` typo,
-    /// row corruption) decode as the more restrictive
-    /// [`MemoryTaint::ExternalSync`] so the subconscious gate fails
-    /// closed — we'd rather refuse external_effect tools on a chunk
-    /// of unknown provenance than silently treat it as user-authored.
-    /// Legacy rows that pre-date the column are not affected: the
-    /// migration writes a literal `'internal'` default so they
-    /// round-trip cleanly through the explicit arm.
-    pub fn from_db_str(raw: &str) -> Self {
-        match raw {
-            "internal" => Self::Internal,
-            "external_sync" => Self::ExternalSync,
-            _ => Self::ExternalSync,
-        }
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// Represents a single stored memory entry with associated metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]

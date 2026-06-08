@@ -18,3 +18,11 @@ pub trait IntegrationClient: Send + Sync {
 pub trait IntegrationClientFactory: Send + Sync {
     fn build_client(&self, base_url: &str, api_key: Option<&str>) -> Box<dyn IntegrationClient>;
 }
+
+/// Build an integration client (stub).
+pub fn build_client(
+    _base_url: &str,
+    _api_key: Option<&str>,
+) -> anyhow::Result<Box<dyn IntegrationClient>> {
+    anyhow::bail!("integration client not available in standalone mode")
+}

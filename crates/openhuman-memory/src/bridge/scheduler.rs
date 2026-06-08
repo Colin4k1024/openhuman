@@ -44,6 +44,27 @@ pub trait SchedulerGate: Send + Sync {
     fn update_config(&self, config: Option<serde_json::Value>);
 }
 
+/// Gate module (mirrors scheduler_gate::gate).
+pub mod gate {
+    use super::SchedulerPolicy;
+
+    pub fn current_policy() -> SchedulerPolicy {
+        SchedulerPolicy::Running
+    }
+
+    pub fn update_config(_config: Option<serde_json::Value>) {}
+}
+
+/// Policy module (mirrors scheduler_gate::policy).
+pub mod policy {
+    pub use super::{PauseReason, SchedulerPolicy};
+}
+
+/// Wait for scheduler capacity (standalone: immediate).
+pub async fn wait_for_capacity() -> GatePermit {
+    GatePermit::new()
+}
+
 /// No-op gate that always permits (standalone mode).
 #[derive(Clone, Default)]
 pub struct AlwaysPermitGate;

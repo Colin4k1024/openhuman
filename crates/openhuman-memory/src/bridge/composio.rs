@@ -36,6 +36,11 @@ pub trait ComposioClient: Send + Sync {
 
 /// Profile/identity helpers.
 pub mod providers {
+    /// Re-export profile_md at providers level.
+    pub mod profile_md {
+        pub use super::super::profile_md::*;
+    }
+
     pub mod profile {
         /// Identity kind for self-recognition.
         #[derive(Clone, Debug, PartialEq, Eq)]
@@ -60,6 +65,7 @@ pub mod providers {
 #[derive(Clone, Debug)]
 pub enum ComposioClientKind {
     Default,
+    Direct,
     Custom(String),
 }
 
@@ -91,7 +97,43 @@ pub async fn direct_execute(
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ComposioExecuteResponse {
     pub success: bool,
+    pub successful: bool,
     pub data: serde_json::Value,
+    pub error: Option<String>,
+}
+
+/// A composio connection.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ComposioConnection {
+    pub id: String,
+    pub app_name: String,
+    pub status: String,
+}
+
+/// Connections response.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ComposioConnectionsResponse {
+    pub connections: Vec<ComposioConnection>,
+}
+
+/// Capability descriptor.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ComposioCapability {
+    pub name: String,
+    pub description: String,
+}
+
+/// Trigger history stub.
+pub mod trigger_history {
+    pub async fn list(
+        _config: &crate::config::Config,
+    ) -> anyhow::Result<Vec<serde_json::Value>> {
+        Ok(Vec::new())
+    }
+
+    pub fn global() -> Vec<serde_json::Value> {
+        Vec::new()
+    }
 }
 
 /// Composio ops stubs.
@@ -101,6 +143,14 @@ pub mod ops {
     ) -> anyhow::Result<super::FetchConnectedIntegrationsStatus> {
         Ok(super::FetchConnectedIntegrationsStatus::default())
     }
+
+    pub fn invalidate_connected_integrations_cache() {}
+
+    pub fn fetch_connected_integrations_status() -> super::FetchConnectedIntegrationsStatus {
+        super::FetchConnectedIntegrationsStatus::default()
+    }
+
+    pub fn report_composio_op_error(_msg: &str) {}
 }
 
 /// Profile.md managed-block helpers.
