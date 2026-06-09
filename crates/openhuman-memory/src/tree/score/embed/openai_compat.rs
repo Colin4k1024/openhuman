@@ -71,7 +71,7 @@ impl OpenAiCompatEmbedder {
             slug,
             model,
             EMBEDDING_DIM,
-            &api_key,
+            api_key.as_deref(),
             custom_endpoint,
         )
         .with_context(|| format!("build {label} embedder for memory tree"))?;

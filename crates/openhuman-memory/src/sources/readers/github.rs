@@ -20,6 +20,7 @@ use crate::store::content::raw::RawKind;
 
 use super::SourceReader;
 
+#[allow(dead_code)]
 const DEFAULT_BRANCH: &str = "main";
 
 /// Cache of issue/PR data populated during `list_items` so `read_item`
@@ -95,6 +96,7 @@ enum ItemKind {
 }
 
 impl ItemKind {
+    #[allow(dead_code)]
     fn prefix(self) -> &'static str {
         match self {
             ItemKind::Commit => "commit",
@@ -134,6 +136,7 @@ pub(crate) fn repo_archive_source_id(url: &str) -> Option<String> {
 /// `github:<owner>/<repo>:<item_id>` keeps per-item uniqueness for the
 /// `mem_tree_ingested_sources` dedup table while the separate
 /// [`repo_chunk_scope`] drives a shared directory.
+#[allow(dead_code)]
 pub(crate) fn chunk_source_id(url: &str, item_id: &str) -> Option<String> {
     let (owner, repo) = parse_github_url(url).ok()?;
     Some(format!("github:{owner}/{repo}:{item_id}"))
@@ -268,6 +271,7 @@ struct GhPr {
     updated_at: Option<String>,
     merged_at: Option<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     comments: u64,
 }
 

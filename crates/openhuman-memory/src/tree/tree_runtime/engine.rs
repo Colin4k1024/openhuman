@@ -275,7 +275,7 @@ pub async fn rebuild_tree(
     // re-written above), logging each failure for diagnosis; the rebuild still
     // returns the resulting status rather than erroring out wholesale.
     let mut failed: Vec<String> = Vec::new();
-    let mut propagate = |id: &str, level: NodeLevel| {
+    let propagate = |id: &str, level: NodeLevel| {
         let node_id = id.to_string();
         async move {
             if let Err(e) =

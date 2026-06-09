@@ -43,6 +43,7 @@ pub use types::{
 };
 
 use crate::bridge::agent::harness::session::transcript::{self, SessionTranscript};
+use crate::bridge::inference::ChatMessage;
 use crate::orchestration::Memory;
 use futures::stream::StreamExt;
 use std::path::Path;
@@ -88,10 +89,15 @@ pub async fn ingest_session_transcript(
     let thread_id = transcript.meta.thread_id.clone();
     let now = chrono::Utc::now().to_rfc3339();
 
+    let chat_messages: Vec<ChatMessage> = transcript.messages.iter().map(|m| ChatMessage {
+        role: m.role.clone(),
+        content: m.content.clone(),
+    }).collect();
+
     let extracted = extract::extract_candidates(
-        &transcript.messages,
+        &chat_messages,
         &extract::Provenance {
-            thread_id: thread_id.clone(),
+            thread_id: Some(thread_id.clone()),
             transcript_path: path_display.clone(),
             transcript_basename: basename.clone(),
             extracted_at: now.clone(),
@@ -99,9 +105,9 @@ pub async fn ingest_session_transcript(
     );
 
     let reflections = extract::extract_reflections(
-        &transcript.messages,
+        &chat_messages,
         &extract::Provenance {
-            thread_id: thread_id.clone(),
+            thread_id: Some(thread_id.clone()),
             transcript_path: path_display.clone(),
             transcript_basename: basename.clone(),
             extracted_at: now,
@@ -139,7 +145,7 @@ pub async fn ingest_session_transcript(
     // *basename* (not the full path) and avoid logging transcript-derived
     // content (e.g. reflection theme) so failure logs can't leak the user's
     // home directory or conversational PII.
-    let thread_label = thread_id.as_deref().unwrap_or("-");
+    let thread_label = thread_id.as_str();
     let transcript_label = basename.as_str();
 
     let candidate_futs: Vec<_> = kept
@@ -192,7 +198,7 @@ pub async fn ingest_session_transcript(
         stored_reflections,
         reflection_total,
         deduped_reflections,
-        thread_id.as_deref().unwrap_or("-"),
+        thread_id.as_str(),
     );
 
     Ok(IngestionReport {

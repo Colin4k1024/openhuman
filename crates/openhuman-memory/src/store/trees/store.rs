@@ -1,4 +1,5 @@
 //! SQLite-backed persistence for Phase 3a summary trees (#709).
+#![allow(dead_code)]
 //!
 //! Three tables (schema lives in the sibling `tree::store::SCHEMA`):
 //! - `mem_tree_trees`      — one row per tree (kind, scope, root, max_level)

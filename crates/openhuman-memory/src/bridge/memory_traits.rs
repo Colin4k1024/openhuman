@@ -44,59 +44,170 @@ pub use crate::orchestration::traits::{Memory, MemoryCategory, MemoryEntry, Name
 
 /// Ingestion types and queue control.
 pub mod ingestion {
+    #[cfg(not(feature = "__full_app"))]
     use serde::{Deserialize, Serialize};
+    #[cfg(not(feature = "__full_app"))]
+    use std::sync::Arc;
+    #[cfg(not(feature = "__full_app"))]
+    use tokio::sync::Mutex;
 
-    /// Ingestion job state.
-    #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-    pub enum IngestionState {
-        #[default]
-        Idle,
-        Running,
-        Completed,
-        Failed(String),
+    // Under __full_app, re-export the canonical types from orchestration so
+    // callers that import from the bridge get the real types that
+    // UnifiedMemory::ingest_document expects.
+    #[cfg(feature = "__full_app")]
+    pub use crate::orchestration::ingestion::{
+        IngestionJob, IngestionQueue, IngestionState, MemoryIngestionConfig,
+        MemoryIngestionRequest, MemoryIngestionResult,
+    };
+
+    /// Snapshot of ingestion queue state (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
+    #[derive(Clone, Debug, Default)]
+    pub struct IngestionStateSnapshot {
+        pub queue_depth: usize,
+        pub running: bool,
+        pub current_document_id: Option<String>,
+        pub current_title: Option<String>,
+        pub current_namespace: Option<String>,
+        pub last_completed_at: Option<i64>,
+        pub last_document_id: Option<String>,
+        pub last_success: Option<bool>,
     }
 
-    /// Ingestion job descriptor.
+    /// Ingestion state guard — holds the lock during a synchronous ingestion (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
+    pub struct IngestionStateGuard;
+
+    /// Shared ingestion state (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
     #[derive(Clone, Debug, Default)]
+    pub struct IngestionState {
+        #[allow(dead_code)]
+        inner: Arc<Mutex<IngestionStateInner>>,
+    }
+
+    #[cfg(not(feature = "__full_app"))]
+    #[derive(Debug, Default)]
+    struct IngestionStateInner {
+        #[allow(dead_code)]
+        queue_depth: usize,
+        #[allow(dead_code)]
+        running: bool,
+        #[allow(dead_code)]
+        current_document_id: Option<String>,
+    }
+
+    #[cfg(not(feature = "__full_app"))]
+    impl IngestionState {
+        pub fn new() -> Self {
+            Self::default()
+        }
+
+        /// Acquire exclusive ingestion lock (no-op stub in standalone mode).
+        pub async fn acquire(&self) -> IngestionStateGuard {
+            IngestionStateGuard
+        }
+
+        /// Return a snapshot of current state.
+        pub fn snapshot(&self) -> IngestionStateSnapshot {
+            // In standalone mode, queue is always empty.
+            IngestionStateSnapshot::default()
+        }
+
+        /// Mark an ingestion as running.
+        pub fn mark_running(&self, _document_id: &str, _title: &str, _namespace: &str) {}
+
+        /// Mark the current ingestion as completed.
+        pub fn mark_completed(&self, _document_id: &str, _success: bool, _timestamp_ms: i64) {}
+    }
+
+    /// Ingestion job descriptor (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
+    #[derive(Clone, Debug)]
     pub struct IngestionJob {
-        pub id: String,
-        pub source: String,
-        pub state: IngestionState,
+        pub document_id: String,
+        pub document: crate::store::types::NamespaceDocumentInput,
+        pub config: MemoryIngestionConfig,
     }
 
-    /// Ingestion queue handle.
+    /// Ingestion queue handle (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
     #[derive(Clone, Debug, Default)]
-    pub struct IngestionQueue;
+    pub struct IngestionQueue {
+        state: IngestionState,
+    }
 
-    /// Ingestion config.
+    #[cfg(not(feature = "__full_app"))]
+    impl IngestionQueue {
+        pub fn new() -> Self {
+            Self::default()
+        }
+
+        /// Submit a job to the background queue (no-op stub).
+        pub fn submit(&self, _job: IngestionJob) {}
+
+        /// Return the shared ingestion state.
+        pub fn state(&self) -> &IngestionState {
+            &self.state
+        }
+    }
+
+    /// Ingestion config (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
     #[derive(Clone, Debug, Default, Serialize, Deserialize)]
     pub struct MemoryIngestionConfig {
         pub enabled: bool,
     }
 
-    /// Ingestion request.
+    /// Ingestion request (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
     #[derive(Clone, Debug)]
     pub struct MemoryIngestionRequest {
-        pub source: String,
-        pub content: String,
+        pub document: crate::store::types::NamespaceDocumentInput,
+        pub config: MemoryIngestionConfig,
     }
 
-    /// Ingestion result.
-    #[derive(Clone, Debug, Default)]
+    /// Ingestion result (standalone stub).
+    #[cfg(not(feature = "__full_app"))]
+    #[derive(Clone, Debug, Default, Serialize, Deserialize)]
     pub struct MemoryIngestionResult {
         pub chunks_created: u32,
+        pub chunk_count: u32,
+        pub entity_count: u32,
+        pub relation_count: u32,
     }
 
     /// Queue control submodule.
     pub mod queue {
+        #[cfg(not(feature = "__full_app"))]
+        use std::sync::Arc;
+        #[cfg(not(feature = "__full_app"))]
+        use crate::store::unified::UnifiedMemory;
+
+        #[cfg(feature = "__full_app")]
+        pub use crate::orchestration::ingestion::queue::start_worker_with_state;
+
+        #[cfg(not(feature = "__full_app"))]
         pub fn pause() {}
+        #[cfg(not(feature = "__full_app"))]
         pub fn resume() {}
+        #[cfg(not(feature = "__full_app"))]
         pub fn is_paused() -> bool { false }
-        pub fn start_worker_with_state(_config: &crate::config::Config) {}
+        #[cfg(not(feature = "__full_app"))]
+        pub fn start_worker_with_state(
+            _memory: Arc<UnifiedMemory>,
+            _state: super::IngestionState,
+        ) -> super::IngestionQueue {
+            super::IngestionQueue::new()
+        }
     }
 
+    #[cfg(not(feature = "__full_app"))]
     pub fn pause() {}
+    #[cfg(not(feature = "__full_app"))]
     pub fn resume() {}
+    #[cfg(not(feature = "__full_app"))]
     pub fn is_paused() -> bool { false }
+    #[cfg(not(feature = "__full_app"))]
     pub fn start_worker_with_state(_config: &crate::config::Config) {}
 }

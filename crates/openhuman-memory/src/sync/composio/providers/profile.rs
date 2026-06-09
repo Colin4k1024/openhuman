@@ -506,6 +506,7 @@ fn normalize_token(raw: &str) -> String {
     out.trim_matches('_').to_string()
 }
 
+#[allow(dead_code)]
 pub(crate) fn normalize_connection_identifier(raw: &str) -> String {
     normalize_token(raw)
 }

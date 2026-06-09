@@ -1,4 +1,5 @@
 //! Persistence for Phase 2 artefacts (#708):
+#![allow(dead_code)]
 //!
 //! - `mem_tree_score` — per-chunk score rationale (which signals fired, why
 //!   dropped/kept)

@@ -179,8 +179,9 @@ fn periodic_pause_reason() -> Option<PauseReason> {
     // the existing `Policy::pause_reason()` helper (avoids re-implementing
     // the same destructure twice). The allow-list below is the only thing
     // this site has to own — future `PauseReason` variants stay opt-in.
-    let reason = current_policy().pause_reason()?;
-    matches!(reason, PauseReason::UserDisabled | PauseReason::SignedOut).then_some(reason)
+    let policy = current_policy();
+    let reason = policy.pause_reason()?;
+    matches!(reason, PauseReason::UserDisabled | PauseReason::SignedOut).then_some(reason.clone())
 }
 
 /// Process-level "was the last tick paused?" tracker for transition logging.

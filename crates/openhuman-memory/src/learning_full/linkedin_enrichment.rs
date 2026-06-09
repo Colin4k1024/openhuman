@@ -205,7 +205,8 @@ pub async fn run_linkedin_enrichment(
         }
     };
 
-    match scrape_linkedin_profile(&client, &url).await {
+    let client_arc: Arc<dyn IntegrationClient> = Arc::from(client);
+    match scrape_linkedin_profile(&client_arc, &url).await {
         Ok(data) => {
             tracing::info!("[linkedin_enrichment] Apify scrape succeeded");
             result
@@ -327,6 +328,7 @@ pub async fn summarise_profile_with_llm(config: &Config, raw_md: &str) -> anyhow
             .or_else(|| Some(config.workspace_dir.clone())),
         secrets_encrypt: config.secrets.encrypt,
         reasoning_enabled: config.runtime.reasoning_enabled,
+        ..Default::default()
     };
     let provider = create_backend_inference_provider(
         config.inference_url.as_deref(),
@@ -551,7 +553,7 @@ async fn search_gmail_for_linkedin(config: &Config) -> anyhow::Result<Option<Str
                 direct,
                 "GMAIL_FETCH_EMAILS",
                 Some(args),
-                &config.composio.entity_id,
+                config.composio.entity_id.as_deref().unwrap_or(""),
             )
             .await
             .map_err(|e| anyhow::anyhow!("GMAIL_FETCH_EMAILS (direct) failed: {e:#}"))?
@@ -654,7 +656,7 @@ pub async fn scrape_linkedin_profile(
     // The backend wraps the Apify response in its standard envelope.
     // `IntegrationClient::post` already unwraps `{ success, data }`.
     let resp: serde_json::Value = client
-        .post("/agent-integrations/apify/run", &body)
+        .post("/agent-integrations/apify/run", body)
         .await
         .map_err(|e| anyhow::anyhow!("Apify run failed: {e:#}"))?;
 

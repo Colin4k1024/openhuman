@@ -38,6 +38,7 @@ pub const DEFAULT_TIMEOUT_MS: u64 = 10_000;
 /// Cloneable — `reqwest::Client` shares a connection pool under the hood
 /// so cloning the wrapper stays cheap across seal / ingest call sites.
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct OllamaEmbedder {
     endpoint: String,
     model: String,

@@ -501,6 +501,7 @@ fn parse_kind(s: &str) -> Option<EntityKind> {
 ///
 /// Uses byte-level `find` then translates to char offsets so spans align
 /// with the rest of the extractor pipeline (which is char-based).
+#[allow(dead_code)]
 fn find_char_span(haystack: &str, needle: &str) -> Option<(u32, u32)> {
     find_char_span_from(haystack, needle, 0, 0).map(|(s, e, _)| (s, e))
 }

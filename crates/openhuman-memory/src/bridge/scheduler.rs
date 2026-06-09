@@ -7,11 +7,36 @@ use async_trait::async_trait;
 /// Pause reason (mirrors scheduler_gate::policy::PauseReason).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PauseReason {
+    /// User explicitly turned the gate off.
+    UserDisabled,
+    /// Host on battery and gate's power-aware mode kicked in.
+    OnBattery,
+    /// CPU pressure exceeded the gate threshold.
+    CpuPressure,
+    /// No active app session — signed out.
+    SignedOut,
+    /// Pause reason not yet classified.
+    Unknown,
+    // Legacy variants kept for compat:
     UserPaused,
     LowBattery,
     LowBandwidth,
     RateLimited,
     Other(String),
+}
+
+impl PauseReason {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::UserDisabled | Self::UserPaused => "user_disabled",
+            Self::OnBattery | Self::LowBattery => "on_battery",
+            Self::CpuPressure => "cpu_pressure",
+            Self::SignedOut => "signed_out",
+            Self::LowBandwidth => "low_bandwidth",
+            Self::RateLimited => "rate_limited",
+            Self::Unknown | Self::Other(_) => "unknown",
+        }
+    }
 }
 
 /// Scheduler policy (mirrors scheduler_gate::policy).
@@ -20,6 +45,16 @@ pub enum SchedulerPolicy {
     Running,
     Throttled,
     Paused(PauseReason),
+}
+
+impl SchedulerPolicy {
+    /// Return the pause reason if in Paused state.
+    pub fn pause_reason(&self) -> Option<&PauseReason> {
+        match self {
+            Self::Paused(reason) => Some(reason),
+            _ => None,
+        }
+    }
 }
 
 /// RAII permit — dropped when the work completes.
@@ -52,7 +87,7 @@ pub mod gate {
         SchedulerPolicy::Running
     }
 
-    pub fn update_config(_config: Option<serde_json::Value>) {}
+    pub fn update_config(_config: crate::config::SchedulerGateConfig) {}
 }
 
 /// Policy module (mirrors scheduler_gate::policy).

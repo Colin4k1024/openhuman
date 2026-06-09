@@ -128,6 +128,7 @@ pub fn capability_matrix() -> Vec<ComposioCapability> {
             let catalog = catalog_for_toolkit(toolkit);
             let sync_interval_secs = native_provider_sync_interval(toolkit);
             ComposioCapability {
+                name: (*toolkit).to_string(),
                 toolkit: (*toolkit).to_string(),
                 description: toolkit_description(toolkit).to_string(),
                 native_provider,

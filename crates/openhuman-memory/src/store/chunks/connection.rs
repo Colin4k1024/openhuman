@@ -74,6 +74,7 @@ const SQLITE_IOERR_IN_PAGE: i32 = 8714;
 /// that fire during cold-start WAL/SHM bootstrap races: `CANTOPEN`,
 /// `IOERR_TRUNCATE`, the `-shm` family (`SHMOPEN` / `SHMSIZE` / `SHMMAP`), and
 /// `IOERR_IN_PAGE`.
+#[allow(dead_code)]
 pub(crate) fn is_transient_cold_start(err: &anyhow::Error) -> bool {
     fn is_transient_sqlite(e: &(dyn std::error::Error + 'static)) -> bool {
         if let Some(rusqlite::Error::SqliteFailure(ffi, _)) = e.downcast_ref::<rusqlite::Error>() {

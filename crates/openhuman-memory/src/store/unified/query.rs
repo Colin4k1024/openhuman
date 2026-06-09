@@ -33,6 +33,7 @@ const RECALL_GRAPH_WEIGHT: f64 = 0.30;
 const RECALL_FRESHNESS_WEIGHT: f64 = 0.25;
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct StoredChunk {
     document_id: String,
     chunk_id: String,

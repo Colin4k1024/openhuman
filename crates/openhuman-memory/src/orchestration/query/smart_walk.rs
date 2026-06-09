@@ -400,8 +400,14 @@ struct ChatProviderAdapter {
 impl Provider for ChatProviderAdapter {
     fn name(&self) -> &str { "chat_provider_adapter" }
     async fn complete_chat(&self, prompt: &crate::bridge::inference::ChatPrompt) -> anyhow::Result<crate::bridge::inference::ChatResponse> {
-        let text = self.inner.chat_for_text(prompt).await?;
-        Ok(crate::bridge::inference::ChatResponse { content: text, usage: None })
+        let adapted = crate::orchestration::chat::ChatPrompt {
+            system: prompt.system.clone(),
+            user: prompt.user.clone(),
+            temperature: prompt.temperature,
+            kind: "smart_walk",
+        };
+        let text = self.inner.chat_for_text(&adapted).await?;
+        Ok(crate::bridge::inference::ChatResponse { content: text.clone(), text: Some(text), usage: None })
     }
     async fn chat_with_system(
         &self,

@@ -421,7 +421,7 @@ async fn check_and_rebuild_tree(source: &MemorySourceEntry, config: &Config) {
 /// Derive the tree scope string(s) that a source maps to.
 fn derive_scopes(source: &MemorySourceEntry, config: &Config) -> Vec<String> {
     use crate::sources::readers::github;
-    use crate::store::content::raw::slug_account_email;
+    
 
     match source.kind {
         SourceKind::GithubRepo => {

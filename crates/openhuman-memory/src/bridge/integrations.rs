@@ -19,8 +19,16 @@ pub trait IntegrationClientFactory: Send + Sync {
     fn build_client(&self, base_url: &str, api_key: Option<&str>) -> Box<dyn IntegrationClient>;
 }
 
-/// Build an integration client (stub).
+/// Build an integration client from config (stub).
+/// Returns None in standalone mode (mirrors the real app returning None when not signed in).
 pub fn build_client(
+    _config: &crate::config::Config,
+) -> Option<Box<dyn IntegrationClient>> {
+    None
+}
+
+/// Build an integration client by explicit base_url + api_key (lower-level stub).
+pub fn build_client_with_credentials(
     _base_url: &str,
     _api_key: Option<&str>,
 ) -> anyhow::Result<Box<dyn IntegrationClient>> {

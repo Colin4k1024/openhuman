@@ -58,7 +58,6 @@ use crate::config::rpc as config_rpc;
 use crate::config::schema::COMPOSIO_MODE_DIRECT;
 
 use super::providers::{get_provider, ProviderContext};
-use crate::bridge::composio::ComposioClient;
 use crate::bridge::composio::ops;
 use crate::bridge::composio::FetchConnectedIntegrationsStatus;
 
@@ -204,7 +203,7 @@ impl EventHandler for ComposioTriggerSubscriber {
         // existing env-var / config triage flags below remain the
         // backend-mode gates.
         if let Ok(config) = config_rpc::load_config_with_timeout().await {
-            if config.composio.mode == COMPOSIO_MODE_DIRECT {
+            if config.composio.mode.as_deref() == Some(COMPOSIO_MODE_DIRECT) {
                 tracing::info!(
                     toolkit = %toolkit,
                     trigger = %trigger,
@@ -750,7 +749,7 @@ impl EventHandler for ComposioConfigChangedSubscriber {
         };
 
         tracing::info!(
-            mode = %mode,
+            mode = ?mode,
             api_key_set = api_key_set,
             "[composio-cache] config changed — invalidating integrations cache"
         );

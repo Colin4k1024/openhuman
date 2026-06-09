@@ -133,15 +133,15 @@ impl ToolMemoryCaptureHook {
     /// transient one-off failures are ignored to keep the namespace
     /// from filling with noise.
     pub fn extract_repeated_failures(tool_calls: &[ToolCallRecord]) -> Vec<(String, String)> {
-        let mut tallies: HashMap<&str, (usize, Option<&str>)> = HashMap::new();
+        let mut tallies: HashMap<String, (usize, Option<String>)> = HashMap::new();
         for tc in tool_calls {
             if tc.success {
                 continue;
             }
-            let entry = tallies.entry(tc.name.as_str()).or_insert((0, None));
+            let entry = tallies.entry(tc.name.clone()).or_insert((0, None));
             entry.0 += 1;
             if entry.1.is_none() {
-                entry.1 = Some(tc.output_summary.as_str());
+                entry.1 = tc.output_summary.clone();
             }
         }
 
@@ -225,6 +225,7 @@ impl PostTurnHook for ToolMemoryCaptureHook {
 
 /// Helper: emit a [`ToolMemoryRule`] preview without flooding logs with
 /// raw user prose.
+#[allow(dead_code)]
 fn truncate_for_log(body: &str) -> String {
     let mut out: String = body.chars().take(80).collect();
     if body.chars().count() > 80 {

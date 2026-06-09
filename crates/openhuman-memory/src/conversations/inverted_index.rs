@@ -180,6 +180,7 @@ impl InvertedIndex {
 
     /// Reset the index to its empty state. Cheaper than dropping and
     /// re-allocating when a workspace is being rebuilt.
+    #[allow(dead_code)]
     pub fn clear(&mut self) {
         self.postings.clear();
         self.docs.clear();

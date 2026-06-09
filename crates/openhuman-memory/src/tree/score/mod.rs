@@ -1,4 +1,5 @@
 //! Phase 2: scoring / admission / enrichment pipeline (#708).
+#![allow(dead_code)]
 //!
 //! Wraps extraction, signal computation, admission gate, canonicalisation,
 //! and persistence into one call per chunk. Phase 1 `_ingest_one_chunk`

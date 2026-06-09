@@ -14,7 +14,7 @@ use std::sync::Arc;
 
 use crate::config::{EmbeddingRouteConfig, MemoryConfig, StorageProviderConfig};
 use crate::embeddings::{
-    self, format_embedding_signature, EmbeddingProvider,
+    format_embedding_signature, EmbeddingProvider,
     DEFAULT_OLLAMA_DIMENSIONS, DEFAULT_OLLAMA_MODEL,
 };
 use crate::embedding_ext::{DEFAULT_CLOUD_EMBEDDING_DIMENSIONS, DEFAULT_CLOUD_EMBEDDING_MODEL};
@@ -60,10 +60,9 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
     // the `format!("{:#}")` round-trip that `report_error` would do on an
     // anyhow chain — the wire shape stays bit-identical.
     tracing::warn!(
+        "{} [ollama_host={} fallback=cloud]",
         sentry_message.as_str(),
-        "memory",
-        "ollama_health_gate",
-        &[("ollama_host", host_tag), ("fallback", "cloud")],
+        host_tag,
     );
 
     // Publish a user-visible domain event so the UI can surface a notification
@@ -78,9 +77,9 @@ fn report_ollama_health_gate_once(base_url: &str, model: &str) -> bool {
         "[memory::factory] publishing EmbeddingModelUnhealthy event: provider=ollama model={model} fallback=cloud"
     );
     let event = crate::bridge::events::DomainEvent::EmbeddingModelUnhealthy {
-        provider: "ollama".to_string(),
+        provider: Some("ollama".to_string()),
         model: model.to_string(),
-        fallback_provider: "cloud".to_string(),
+        fallback_provider: Some("cloud".to_string()),
         message: user_message,
     };
     // publish_global is infallible (drops the event when no receivers are

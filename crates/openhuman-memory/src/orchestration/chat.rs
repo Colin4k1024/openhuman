@@ -13,7 +13,7 @@ use async_trait::async_trait;
 
 use crate::config::{Config, DEFAULT_CLOUD_LLM_MODEL};
 use crate::bridge::inference::{
-    create_chat_provider, provider_for_role, ChatMessage, ChatRequest, Provider, UsageInfo,
+    ChatMessage, ChatRequest, Provider, UsageInfo,
 };
 
 /// One pair of prompt messages handed to the memory LLM backend.
@@ -98,29 +98,26 @@ impl InferenceChatProvider {
         ];
 
         let request = ChatRequest {
-            messages: &messages,
-            tools: None,
-            stream: None,
+            messages,
+            model: self.model.clone(),
+            temperature: prompt.temperature,
+            kind: prompt.kind,
+            ..Default::default()
         };
 
-        let response = self
+        let (text, usage) = self
             .inner
-            .chat(request, &self.model, prompt.temperature)
+            .chat_for_text_with_usage(&request)
             .await?;
 
-        // Fail fast on a missing body rather than masking it as an empty
-        // string: an empty summary would still be ingested (and, post-#3110,
-        // counted against the run's real charge) as if it were valid output.
-        // The caller's fallback path (`fallback_summary`) is the correct
-        // recovery for a silent provider, and it only runs on `Err`.
-        let Some(text) = response.text else {
+        // Fail fast on an empty body.
+        if text.is_empty() {
             anyhow::bail!(
                 "inference provider '{}' returned no text for {} summarise request",
                 self.display,
                 prompt.kind
             );
-        };
-        let usage = response.usage;
+        }
 
         log::debug!(
             "[memory::chat] provider={} kind={} response_chars={} usage_present={} input_tokens={} output_tokens={} charged_usd={}",
@@ -190,17 +187,16 @@ pub fn build_chat_runtime(config: &Config) -> Result<(Arc<dyn ChatProvider>, Str
     }
 
     let routed = routed_memory_config(config);
-    let resolved_provider = provider_for_role("summarization", &routed);
-    let (provider, model) = create_chat_provider("summarization", &routed)?;
+    let (raw_provider, model) = crate::bridge::inference::build_chat_runtime(&routed)
+        .map_err(|e| anyhow::anyhow!("tree summarizer: failed to build cloud provider: {e:#}"))?;
 
     log::debug!(
-        "[memory::chat] built provider route={} model={}",
-        resolved_provider,
+        "[memory::chat] built provider model={}",
         model
     );
 
     Ok((
-        Arc::new(InferenceChatProvider::new(provider, model.clone())),
+        Arc::new(InferenceChatProvider::new(raw_provider, model.clone())),
         model,
     ))
 }

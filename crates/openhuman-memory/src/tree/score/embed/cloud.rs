@@ -24,7 +24,6 @@ use crate::config::Config;
 use crate::embedding_ext::cloud::{
     OpenHumanCloudEmbedding, DEFAULT_CLOUD_EMBEDDING_DIMENSIONS, DEFAULT_CLOUD_EMBEDDING_MODEL,
 };
-use crate::embeddings::EmbeddingProvider;
 
 /// Cloud-backed memory_tree embedder.
 ///

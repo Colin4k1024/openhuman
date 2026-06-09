@@ -185,8 +185,9 @@ fn create_provider(
 
     // Cloud path — user has explicitly opted in. Build the configured
     // provider for the summarization role (`memory_provider` hint).
-    crate::bridge::inference::build_chat_provider("summarization", config)
-        .map_err(|e| format!("tree summarizer: failed to build cloud provider: {e:#}"))
+    let (provider, model) = crate::bridge::inference::build_chat_runtime(config)
+        .map_err(|e| format!("tree summarizer: failed to build cloud provider: {e:#}"))?;
+    Ok((provider, model))
 }
 
 /// Whether a summarization provider can be resolved for "Build Summary Trees"

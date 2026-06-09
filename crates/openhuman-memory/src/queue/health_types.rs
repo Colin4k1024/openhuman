@@ -14,6 +14,14 @@ impl PipelineFailure {
     }
 }
 
+impl std::fmt::Display for PipelineFailure {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}:{}] {}", self.code.as_str(), self.class.as_str(), self.message)
+    }
+}
+
+impl std::error::Error for PipelineFailure {}
+
 /// Failure code classification.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum FailureCode {

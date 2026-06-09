@@ -40,13 +40,17 @@ impl ToolResult {
     }
 }
 
-/// Permission level for a tool.
+/// Permission level for a tool — mirrors the main app's `PermissionLevel`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum PermissionLevel {
     #[default]
     ReadOnly,
     Write,
+    /// Execute-level (run commands, shell).
+    Execute,
     Admin,
+    /// Dangerous operations (destructive, irreversible).
+    Dangerous,
 }
 
 /// Tool category for grouping.

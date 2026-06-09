@@ -168,6 +168,7 @@ impl UnifiedMemory {
         items
     }
 
+    #[allow(dead_code)]
     pub(crate) fn merge_unique_string_arrays(
         current: &serde_json::Value,
         incoming: &serde_json::Value,

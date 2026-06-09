@@ -48,6 +48,7 @@ pub(super) const BASE_QUERY: &str = "-in:spam -in:trash";
 ///
 /// Any of these can be passed as the `query` parameter to `GMAIL_FETCH_EMAILS`
 /// to fetch outbound messages. Exported `pub(super)` for use in regression tests.
+#[allow(dead_code)]
 pub(super) const SENT_QUERIES: &[&str] = &["from:me", "label:SENT", "in:sent"];
 
 /// Page size per API call. Kept moderate so each call is fast and we

@@ -52,6 +52,10 @@ pub struct ChatPrompt {
     pub user: String,
     /// Prompt kind label (informational).
     pub kind: &'static str,
+    /// Optional tool definitions for function-calling.
+    pub tools: Option<serde_json::Value>,
+    /// Whether to stream the response.
+    pub stream: Option<bool>,
 }
 
 impl ChatPrompt {
@@ -73,11 +77,11 @@ impl ChatPrompt {
 /// Usage information from a completion.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct UsageInfo {
-    pub prompt_tokens: u32,
-    pub completion_tokens: u32,
-    pub total_tokens: u32,
-    pub input_tokens: u32,
-    pub output_tokens: u32,
+    pub prompt_tokens: u64,
+    pub completion_tokens: u64,
+    pub total_tokens: u64,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
     pub charged_amount_usd: f64,
 }
 
@@ -85,6 +89,8 @@ pub struct UsageInfo {
 #[derive(Clone, Debug)]
 pub struct ChatResponse {
     pub content: String,
+    /// Alias for `content` — used by callers that expect `response.text`.
+    pub text: Option<String>,
     pub usage: Option<UsageInfo>,
 }
 
@@ -114,6 +120,23 @@ pub trait ChatProvider: Send + Sync {
             ..Default::default()
         };
         let resp = self.complete_chat(&prompt).await?;
+        Ok(resp.content)
+    }
+
+    /// Simple one-shot chat with a hint and temperature.
+    async fn simple_chat(
+        &self,
+        prompt: &str,
+        hint: &str,
+        temperature: f64,
+    ) -> anyhow::Result<String> {
+        let _ = hint;
+        let p = ChatPrompt {
+            user: prompt.to_string(),
+            temperature,
+            ..Default::default()
+        };
+        let resp = self.complete_chat(&p).await?;
         Ok(resp.content)
     }
 
@@ -148,6 +171,7 @@ pub trait ChatProvider: Send + Sync {
         let resp = self.complete_chat(prompt).await?;
         Ok((resp.content, resp.usage))
     }
+
 }
 
 /// A static chat provider that always returns the same content (for tests).
@@ -168,6 +192,7 @@ impl ChatProvider for StaticChatProvider {
     async fn complete_chat(&self, _prompt: &ChatPrompt) -> anyhow::Result<ChatResponse> {
         Ok(ChatResponse {
             content: self.response.clone(),
+            text: Some(self.response.clone()),
             usage: None,
         })
     }
@@ -176,21 +201,23 @@ impl ChatProvider for StaticChatProvider {
 /// Alias for the ChatProvider trait (used in code that references `Provider`).
 pub use ChatProvider as Provider;
 
-/// Chat request (legacy type alias).
+/// Chat request — alias for `ChatPrompt` (for compatibility with code that constructs
+/// `ChatRequest { messages, model, temperature, kind, ..Default::default() }`).
 pub type ChatRequest = ChatPrompt;
 
-/// Create a chat provider for a specific role (stub).
+/// Create a chat provider for a specific role — returns the provider route label (stub).
 pub fn provider_for_role(
     _role: &str,
     _config: &crate::config::Config,
-) -> anyhow::Result<Box<dyn ChatProvider>> {
-    anyhow::bail!("provider_for_role not available in standalone mode")
+) -> String {
+    "none".to_string()
 }
 
-/// Create a chat provider (stub).
+/// Create a chat provider (stub). Returns (provider, model_id).
 pub fn create_chat_provider(
+    _role: &str,
     _config: &crate::config::Config,
-) -> anyhow::Result<Box<dyn ChatProvider>> {
+) -> anyhow::Result<(Box<dyn ChatProvider>, String)> {
     anyhow::bail!("create_chat_provider not available in standalone mode")
 }
 
@@ -203,13 +230,20 @@ pub mod ops {
     /// Provider runtime options.
     #[derive(Clone, Debug, Default)]
     pub struct ProviderRuntimeOptions {
+        pub auth_profile_override: Option<String>,
+        pub openhuman_dir: Option<std::path::PathBuf>,
+        pub secrets_encrypt: bool,
+        pub reasoning_enabled: bool,
         pub model: Option<String>,
         pub temperature: Option<f64>,
     }
 
     /// Create a backend inference provider (stub).
+    /// Signature mirrors the real implementation: inference_url, api_url, api_key, opts.
     pub fn create_backend_inference_provider(
-        _config: &crate::config::Config,
+        _inference_url: Option<&str>,
+        _api_url: Option<&str>,
+        _api_key: Option<&str>,
         _opts: &ProviderRuntimeOptions,
     ) -> anyhow::Result<Box<dyn super::ChatProvider>> {
         anyhow::bail!("backend inference provider not available in standalone mode")

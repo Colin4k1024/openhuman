@@ -85,6 +85,14 @@ pub struct MemoryTreeConfig {
     pub cloud_summarization_opt_in: bool,
     /// Custom embedding endpoint.
     pub embedding_endpoint: Option<String>,
+    /// Embedding model override.
+    pub embedding_model: Option<String>,
+    /// Cloud LLM model override.
+    pub cloud_llm_model: Option<String>,
+    /// Model used for smart-walk query expansion.
+    pub smart_walk_model: Option<String>,
+    /// Timeout for embedding requests (ms).
+    pub embedding_timeout_ms: Option<u64>,
 }
 
 /// Secrets configuration (API keys, tokens).
@@ -95,6 +103,8 @@ pub struct SecretsConfig {
     pub anthropic_api_key: Option<String>,
     pub cohere_api_key: Option<String>,
     pub voyage_api_key: Option<String>,
+    /// Whether secrets are stored encrypted.
+    pub encrypt: bool,
 }
 
 /// Local AI configuration.
@@ -108,12 +118,31 @@ pub struct LocalAiConfig {
 }
 
 /// Scheduler gate mode.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum SchedulerGateMode {
+    /// Decide based on power + CPU + deployment-mode signals.
     #[default]
+    Auto,
+    /// Always run background AI flat-out.
+    AlwaysOn,
+    /// Never run background AI.
     Off,
+    /// Legacy aliases kept for serde compat.
     On,
     Throttled,
+}
+
+impl SchedulerGateMode {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Auto => "auto",
+            Self::AlwaysOn => "always_on",
+            Self::Off => "off",
+            Self::On => "on",
+            Self::Throttled => "throttled",
+        }
+    }
 }
 
 /// Scheduler gate configuration.
@@ -135,12 +164,50 @@ pub struct ReliabilityConfig {
 }
 
 /// Learning configuration.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct LearningConfig {
     pub enabled: bool,
     pub reflection_interval_secs: u64,
     pub max_candidates: usize,
+    /// Enable post-turn reflection (observation extraction). Default: true.
+    #[serde(default = "learning_default_true")]
+    pub reflection_enabled: bool,
+    /// Enable automatic user profile extraction. Default: true.
+    #[serde(default = "learning_default_true")]
+    pub user_profile_enabled: bool,
+    /// Enable tool effectiveness tracking. Default: true.
+    #[serde(default = "learning_default_true")]
+    pub tool_tracking_enabled: bool,
+    /// Which LLM to use for reflection.
+    #[serde(default)]
+    pub reflection_source: ReflectionSource,
+    /// Maximum reflections per session before throttling. Default: 20.
+    #[serde(default = "learning_default_max_reflections")]
+    pub max_reflections_per_session: usize,
+    /// Minimum tool calls in a turn to trigger reflection. Default: 1.
+    #[serde(default = "learning_default_min_turn_complexity")]
+    pub min_turn_complexity: usize,
+}
+
+fn learning_default_true() -> bool { true }
+fn learning_default_max_reflections() -> usize { 20 }
+fn learning_default_min_turn_complexity() -> usize { 1 }
+
+impl Default for LearningConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            reflection_interval_secs: 0,
+            max_candidates: 0,
+            reflection_enabled: true,
+            user_profile_enabled: true,
+            tool_tracking_enabled: true,
+            reflection_source: ReflectionSource::default(),
+            max_reflections_per_session: 20,
+            min_turn_complexity: 1,
+        }
+    }
 }
 
 /// Top-level config struct that the memory store expects.
@@ -167,9 +234,30 @@ pub struct Config {
     /// Embedding provider name.
     pub embeddings_provider: Option<String>,
     /// Memory sources configuration.
+    #[cfg(feature = "__full_app")]
+    pub memory_sources: Vec<crate::sources::types::MemorySourceEntry>,
+    #[cfg(not(feature = "__full_app"))]
     pub memory_sources: serde_json::Value,
     /// Learning configuration.
     pub learning: LearningConfig,
+    /// Path to the config.toml file (used by `save()` and test helpers).
+    #[serde(skip)]
+    pub config_path: std::path::PathBuf,
+    /// Composio integration configuration (stub).
+    #[serde(default)]
+    pub composio: ComposioConfig,
+    /// Backend API URL.
+    #[serde(default)]
+    pub api_url: Option<String>,
+    /// Backend API key.
+    #[serde(default)]
+    pub api_key: Option<String>,
+    /// Custom LLM inference endpoint (OpenAI-compatible).
+    #[serde(default)]
+    pub inference_url: Option<String>,
+    /// Runtime configuration.
+    #[serde(default)]
+    pub runtime: RuntimeConfig,
 }
 
 impl Default for Config {
@@ -184,12 +272,21 @@ impl Default for Config {
             local_ai: LocalAiConfig::default(),
             scheduler_gate: SchedulerGateConfig::default(),
             reliability: ReliabilityConfig::default(),
-            workspace_dir: data_dir,
+            workspace_dir: data_dir.clone(),
             default_model: None,
             output_language: None,
             embeddings_provider: None,
             learning: LearningConfig::default(),
+            #[cfg(feature = "__full_app")]
+            memory_sources: Vec::new(),
+            #[cfg(not(feature = "__full_app"))]
             memory_sources: serde_json::Value::Null,
+            config_path: data_dir.join("config.toml"),
+            composio: ComposioConfig::default(),
+            api_url: None,
+            api_key: None,
+            inference_url: None,
+            runtime: RuntimeConfig::default(),
         }
     }
 }
@@ -216,6 +313,89 @@ impl Config {
         // Full app wires this to local_ai config.
         None
     }
+
+    /// Returns true if the given workload should use local (Ollama) inference.
+    /// In the full app this is driven by `LocalAiConfig`; here it is always false.
+    pub fn workload_uses_local(&self, _workload: &str) -> bool {
+        false
+    }
+
+    /// Build an output-language directive string for LLM prompts.
+    pub fn output_language_directive(&self) -> Option<String> {
+        output_language_directive(self.output_language.as_deref())
+    }
+
+    /// System prompt override (stub — full app wires to agent config).
+    pub fn prompt(&self) -> Option<&str> {
+        None
+    }
+
+    /// Apply environment-variable overrides to this config.
+    /// Stub — full app reads `OPENHUMAN_*` env vars here.
+    pub fn apply_env_overrides(&mut self) {}
+
+    /// Persist the config to `self.config_path`.
+    ///
+    /// In standalone mode this serialises as JSON (no `toml` dependency).
+    /// The full app uses TOML — call sites that use this via `__full_app`
+    /// depend on the main `Config::save()` which does use TOML.
+    pub async fn save(&self) -> anyhow::Result<()> {
+        use tokio::io::AsyncWriteExt as _;
+        let json = serde_json::to_string_pretty(self)
+            .map_err(|e| anyhow::anyhow!("failed to serialize config: {e}"))?;
+        if let Some(parent) = self.config_path.parent() {
+            tokio::fs::create_dir_all(parent).await?;
+        }
+        let mut f = tokio::fs::File::create(&self.config_path).await?;
+        f.write_all(json.as_bytes()).await?;
+        Ok(())
+    }
+
+    /// Load config from the default location or initialise defaults.
+    /// Mirrors `Config::load_or_init()` from the main app.
+    pub async fn load_or_init() -> anyhow::Result<Self> {
+        let config_path = default_data_dir().join("config.toml");
+        if config_path.exists() {
+            let contents = tokio::fs::read_to_string(&config_path).await?;
+            // Try JSON first (standalone), then fall back to defaults.
+            let mut cfg: Config = serde_json::from_str(&contents)
+                .unwrap_or_default();
+            cfg.config_path = config_path;
+            Ok(cfg)
+        } else {
+            let mut cfg = Config::default();
+            cfg.config_path = config_path;
+            Ok(cfg)
+        }
+    }
+}
+
+/// Runtime configuration stub.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RuntimeConfig {
+    /// Whether reasoning/thinking mode is enabled.
+    pub reasoning_enabled: bool,
+}
+
+/// Composio integration configuration.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ComposioConfig {
+    /// Composio mode: "direct" or "backend".
+    pub mode: Option<String>,
+    /// Composio API key for direct mode.
+    pub api_key: Option<String>,
+    /// Backend endpoint for backend mode.
+    pub backend_url: Option<String>,
+    /// Entity/account identifier for this Composio connection.
+    pub entity_id: Option<String>,
+    /// Toolkits disabled from triage/sync.
+    #[serde(default)]
+    pub triage_disabled_toolkits: Vec<String>,
+    /// Whether triage is disabled globally.
+    #[serde(default)]
+    pub triage_disabled: bool,
 }
 
 /// Storage provider configuration.
@@ -253,10 +433,11 @@ pub mod rpc {
             .unwrap_or_else(|| Arc::new(Config::default()))
     }
 
-    /// Load config with timeout (async, returns the global config).
+    /// Load config with timeout (async, returns a cloned owned Config).
     /// In the full app this waits for config to be ready; here it returns immediately.
-    pub async fn load_config_with_timeout() -> Result<Arc<Config>, String> {
-        Ok(get_config())
+    /// Returns an owned `Config` so call sites can mutate and save.
+    pub async fn load_config_with_timeout() -> Result<Config, String> {
+        Ok((*get_config()).clone())
     }
 
     /// Alias for synchronous access.
@@ -265,8 +446,11 @@ pub mod rpc {
     }
 
     /// Reload config snapshot (async stub).
-    pub async fn reload_config_snapshot_with_timeout() -> Result<Arc<Config>, String> {
-        Ok(get_config())
+    /// Accepts a reference to the current config to mirror the real-app signature.
+    pub async fn reload_config_snapshot_with_timeout(
+        _current: &std::sync::Arc<Config>,
+    ) -> Result<Config, String> {
+        Ok((*get_config()).clone())
     }
 }
 
@@ -296,19 +480,48 @@ pub mod schema {
 
 /// Config ops stubs.
 pub mod ops {
-    pub use super::rpc::{get_config, load_config_with_timeout};
+    pub use super::rpc::{config, get_config, load_config_with_timeout};
 }
 
-/// Global config accessor.
-pub fn global() -> std::sync::Arc<Config> {
-    rpc::get_config()
+/// Stub for the LocalAiService that handles local LLM inference.
+pub struct LocalAiServiceStub;
+
+impl LocalAiServiceStub {
+    /// Run an LLM prompt via local inference (stub — returns error in standalone mode).
+    pub async fn prompt(
+        &self,
+        _config: &Config,
+        _prompt: &str,
+        _max_tokens: Option<u32>,
+        _flag: bool,
+    ) -> anyhow::Result<String> {
+        anyhow::bail!("local AI not available in standalone mode")
+    }
+}
+
+/// Global config accessor / local AI service factory.
+///
+/// When called with a config reference, returns a `LocalAiServiceStub`
+/// that can run local LLM prompts. Mirrors the real app's `local_ai::global(&config)`.
+pub fn global(_config: &Config) -> LocalAiServiceStub {
+    LocalAiServiceStub
 }
 
 /// Default Ollama base URL.
 pub const OLLAMA_BASE_URL: &str = "http://127.0.0.1:11434";
 
-/// Get the configured Ollama base URL.
-pub fn ollama_base_url(config: &Config) -> String {
+/// Get the Ollama base URL from global config.
+/// Call sites that have a `Config` reference should prefer `ollama_base_url_from(config)`.
+pub fn ollama_base_url() -> String {
+    rpc::get_config()
+        .local_ai
+        .ollama_base_url
+        .clone()
+        .unwrap_or_else(|| OLLAMA_BASE_URL.to_string())
+}
+
+/// Get the configured Ollama base URL from a specific config.
+pub fn ollama_base_url_from(config: &Config) -> String {
     config
         .local_ai
         .ollama_base_url

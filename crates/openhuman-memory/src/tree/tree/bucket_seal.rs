@@ -44,7 +44,7 @@ use crate::config::Config;
 use crate::store::chunks::store::with_connection;
 use crate::store::content::{atomic::stage_summary, SummaryComposeInput};
 use crate::store::trees::types::{
-    Buffer, SummaryNode, Tree, TreeKind, INPUT_TOKEN_BUDGET, OUTPUT_TOKEN_BUDGET, SUMMARY_FANOUT,
+    Buffer, SummaryNode, Tree, INPUT_TOKEN_BUDGET, OUTPUT_TOKEN_BUDGET, SUMMARY_FANOUT,
 };
 use crate::tree::score::embed::build_write_embedder;
 use crate::tree::score::extract::EntityExtractor;
@@ -672,7 +672,7 @@ pub(crate) async fn seal_one_level(
     let summary_id_for_closure = summary_id.clone();
     let target_level_for_closure = target_level;
     let tree_id = tree.id.clone();
-    let tree_kind = tree.kind;
+    let _tree_kind = tree.kind;
     with_connection(config, move |conn| {
         let tx = conn.unchecked_transaction()?;
 

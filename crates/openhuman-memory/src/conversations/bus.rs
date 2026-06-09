@@ -61,6 +61,7 @@ pub struct ConversationPersistenceSubscriber {
 }
 
 impl ConversationPersistenceSubscriber {
+    #[allow(dead_code)]
     pub fn new(workspace_dir: PathBuf) -> Self {
         Self {
             workspace_dir: Arc::new(RwLock::new(workspace_dir)),
@@ -122,7 +123,7 @@ impl EventHandler for ConversationPersistenceSubscriber {
                         channel,
                         message_id,
                         sender,
-                        reply_target,
+                        reply_target: reply_target.as_deref().unwrap_or(""),
                         thread_ts: thread_ts.as_deref(),
                         content,
                         role: "user",
@@ -173,12 +174,12 @@ impl EventHandler for ConversationPersistenceSubscriber {
                         channel,
                         message_id,
                         sender,
-                        reply_target,
+                        reply_target: reply_target.as_deref().unwrap_or(""),
                         thread_ts: thread_ts.as_deref(),
-                        content: response,
+                        content: response.as_deref().unwrap_or(""),
                         role: "assistant",
                         success: Some(*success),
-                        elapsed_ms: Some(*elapsed_ms),
+                        elapsed_ms: *elapsed_ms,
                         source: "channel_processed",
                     },
                 ) {
@@ -297,6 +298,7 @@ fn persisted_channel_thread_id(
         channel: channel.to_string(),
         timestamp: 0,
         thread_ts: thread_ts.map(ToOwned::to_owned),
+        ..Default::default()
     });
     format!("channel:{key}")
 }

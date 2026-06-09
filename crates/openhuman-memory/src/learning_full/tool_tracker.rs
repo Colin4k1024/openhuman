@@ -156,7 +156,7 @@ impl PostTurnHook for ToolTrackerHook {
 
         for tc in &ctx.tool_calls {
             let error_summary = if !tc.success {
-                Some(tc.output_summary.as_str())
+                tc.output_summary.as_deref()
             } else {
                 None
             };

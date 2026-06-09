@@ -32,7 +32,7 @@ use chrono::{DateTime, Utc};
 
 use crate::config::Config;
 use crate::store::content::raw::raw_source_dir;
-use crate::store::trees::types::{Tree, TreeKind, TreeStatus};
+use crate::store::trees::types::Tree;
 
 /// Filename of the per-source registry mirror inside `raw/<source_slug>/`.
 pub const SOURCE_FILE_NAME: &str = "_source.md";

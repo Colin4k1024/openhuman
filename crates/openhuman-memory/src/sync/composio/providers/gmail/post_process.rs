@@ -157,6 +157,7 @@ pub fn apply_response_level_markdown(data: &mut Value, top_md: &str) {
 /// each segment really does belong to the message at the same index.
 /// Mismatches force a fallback so we never write a wrong-message body
 /// to the raw archive.
+#[allow(dead_code)]
 pub(crate) fn split_response_markdown_per_message(
     md: &str,
     expected_count: usize,

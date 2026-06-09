@@ -390,11 +390,11 @@ impl StabilityDetector {
 
         // Step 8 — publish CacheRebuilt event.
         event_bus::publish_global(DomainEvent::CacheRebuilt {
-            added,
-            evicted,
-            kept,
+            added: added as u32,
+            evicted: evicted as u32,
+            kept: kept as u32,
             total_size,
-            rebuilt_at: now,
+            rebuilt_at: now.to_string(),
         });
 
         Ok(RebuildOutcome {

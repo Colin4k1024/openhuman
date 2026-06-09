@@ -3,6 +3,7 @@
 //! Ingest content, run summarization jobs, query the tree, and inspect
 //! status from the terminal without starting the full app.
 //!
+#![allow(dead_code)]
 //! Usage:
 //!   openhuman tree-summarizer ingest  <namespace> [--content <text> | --file <path>] [-v]
 //!   openhuman tree-summarizer run     <namespace> [-v]

@@ -379,9 +379,9 @@ async fn persist(
     publish_global(DomainEvent::DocumentCanonicalized {
         source_id: source_id.to_string(),
         source_kind: source_kind_for_store.as_str().to_string(),
-        chunks_written: written,
+        chunks_written: written as u32,
         chunk_ids: chunk_ids.clone(),
-        canonicalized_at: now_secs,
+        canonicalized_at: now_secs.to_string(),
         body_preview,
     });
     tracing::debug!(

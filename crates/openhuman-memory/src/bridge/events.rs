@@ -12,36 +12,95 @@ pub enum MemoryEvent {
     // Memory-specific
     IngestionStarted { source: String },
     IngestionCompleted { source: String, chunks: usize },
-    MemoryIngestionStarted { source: String },
-    MemoryIngestionCompleted { source: String, count: u32 },
-    MemorySyncStageChanged { stage: String, detail: String },
-    DocumentCanonicalized { source: String, doc_id: String },
-    EmbeddingModelUnhealthy { provider: String, error: String },
+    MemoryIngestionStarted {
+        document_id: String,
+        title: String,
+        namespace: String,
+        queue_depth: usize,
+    },
+    MemoryIngestionCompleted {
+        document_id: String,
+        namespace: String,
+        success: bool,
+        elapsed_ms: u64,
+        queue_depth: usize,
+    },
+    MemorySyncStageChanged {
+        trigger: String,
+        stage: String,
+        provider: Option<String>,
+        connection_id: Option<String>,
+        detail: Option<String>,
+    },
+    DocumentCanonicalized {
+        source_id: String,
+        source_kind: String,
+        chunks_written: u32,
+        chunk_ids: Vec<String>,
+        canonicalized_at: String,
+        body_preview: Option<String>,
+    },
+    EmbeddingModelUnhealthy {
+        model: String,
+        provider: Option<String>,
+        fallback_provider: Option<String>,
+        message: String,
+    },
     HealthChanged { component: String, healthy: bool, message: Option<String> },
-    CacheRebuilt { scope: String },
+    CacheRebuilt {
+        added: u32,
+        evicted: u32,
+        kept: u32,
+        rebuilt_at: String,
+        total_size: usize,
+    },
 
     // Tree
     MemoryTreeBuildProgress {
-        tree_scope: String,
+        tree_scope: Option<String>,
         phase: String,
         step: String,
-        detail: String,
+        detail: Option<String>,
         item_count: Option<u32>,
         level: Option<u32>,
     },
     TreeSummarizerHourCompleted { namespace: String, node_id: String, token_count: u32 },
-    TreeSummarizerPropagated { namespace: String, level: u32, node_id: String, token_count: u32 },
-    TreeSummarizerRebuildCompleted { namespace: String, total_nodes: u32 },
+    TreeSummarizerPropagated { namespace: String, level: String, node_id: String, token_count: u32 },
+    TreeSummarizerRebuildCompleted { namespace: String, total_nodes: u64 },
 
     // Channel
-    ChannelMessageReceived { channel: String, message_id: String, sender: String, content: String },
-    ChannelMessageProcessed { channel: String, message_id: String },
+    ChannelMessageReceived {
+        channel: String,
+        message_id: String,
+        sender: String,
+        content: String,
+        reply_target: Option<String>,
+        thread_ts: Option<String>,
+        workspace_dir: std::path::PathBuf,
+    },
+    ChannelMessageProcessed {
+        channel: String,
+        message_id: String,
+        sender: String,
+        reply_target: Option<String>,
+        thread_ts: Option<String>,
+        response: Option<String>,
+        elapsed_ms: Option<u64>,
+        success: bool,
+        workspace_dir: std::path::PathBuf,
+    },
 
     // Composio
-    ComposioConfigChanged {},
-    ComposioConnectionCreated { provider: String },
-    ComposioIntegrationsChanged {},
-    ComposioTriggerReceived { trigger_type: String, payload: String },
+    ComposioConfigChanged { mode: Option<String>, api_key_set: bool },
+    ComposioConnectionCreated { toolkit: String, connection_id: String, connect_url: Option<String> },
+    ComposioIntegrationsChanged { toolkits: Vec<String> },
+    ComposioTriggerReceived {
+        toolkit: String,
+        trigger: String,
+        metadata_id: String,
+        metadata_uuid: String,
+        payload: serde_json::Value,
+    },
 
     // Cron
     CronJobTriggered { job_id: String },
@@ -92,6 +151,6 @@ pub trait EventHandler: Send + Sync {
 pub struct SubscriptionHandle;
 
 /// Subscribe to memory events globally (no-op in standalone mode).
-pub fn subscribe_global(_handler: Box<dyn EventHandler>) -> SubscriptionHandle {
-    SubscriptionHandle
+pub fn subscribe_global(_handler: std::sync::Arc<dyn EventHandler>) -> Option<SubscriptionHandle> {
+    Some(SubscriptionHandle)
 }

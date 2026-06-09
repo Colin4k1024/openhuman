@@ -22,7 +22,7 @@ use crate::queue::store::{
     release_running_locks, DEFAULT_LOCK_DURATION_MS,
 };
 use crate::queue::types::JobOutcome;
-use crate::tree::health::PipelineFailure;
+use crate::queue::health_types::PipelineFailure;
 
 /// Number of concurrent job-worker tasks. Each worker claims one job
 /// at a time via `claim_next` (atomic UPDATE under SQLite WAL with
@@ -202,7 +202,7 @@ pub async fn run_once(config: &Config) -> Result<bool> {
             memory_uses_local
         );
         if memory_uses_local {
-            gate_permit
+            Some(gate_permit)
         } else {
             drop(gate_permit);
             None

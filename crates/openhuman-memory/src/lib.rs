@@ -60,8 +60,18 @@ pub mod embedding_ext {
         None
     }
 
-    /// Create embedding provider (stub).
+    /// Create embedding provider by name/model/dimensions (stub).
+    /// Used by factory code that resolves provider slug + model explicitly.
     pub fn create_embedding_provider(
+        _provider: &str,
+        _model: &str,
+        _dims: usize,
+    ) -> anyhow::Result<Box<dyn openhuman_embeddings::EmbeddingProvider>> {
+        anyhow::bail!("create_embedding_provider not available standalone")
+    }
+
+    /// Create embedding provider from config (stub).
+    pub fn create_embedding_provider_from_config(
         _config: &Config,
     ) -> anyhow::Result<Box<dyn openhuman_embeddings::EmbeddingProvider>> {
         anyhow::bail!("create_embedding_provider not available standalone")
@@ -78,9 +88,22 @@ pub mod embedding_ext {
         anyhow::bail!("create_embedding_provider_with_credentials not available standalone")
     }
 
-    /// Default embedding provider name.
-    pub fn default_embedding_provider() -> String {
-        "cloud".to_string()
+    /// Null embedding provider — returns empty vectors (stub, for compilation only).
+    struct NullEmbeddingProvider;
+
+    #[async_trait::async_trait]
+    impl openhuman_embeddings::EmbeddingProvider for NullEmbeddingProvider {
+        fn name(&self) -> &str { "null" }
+        fn model_id(&self) -> &str { "null" }
+        fn dimensions(&self) -> usize { 0 }
+        async fn embed(&self, texts: &[&str]) -> anyhow::Result<Vec<Vec<f32>>> {
+            Ok(texts.iter().map(|_| vec![]).collect())
+        }
+    }
+
+    /// Default embedding provider (stub — returns a null provider that errors on actual use).
+    pub fn default_embedding_provider() -> std::sync::Arc<dyn openhuman_embeddings::EmbeddingProvider> {
+        std::sync::Arc::new(NullEmbeddingProvider)
     }
 
     /// Cloud module stub.
@@ -89,5 +112,21 @@ pub mod embedding_ext {
         pub use super::DEFAULT_CLOUD_EMBEDDING_MODEL;
 
         pub struct OpenHumanCloudEmbedding;
+
+        impl OpenHumanCloudEmbedding {
+            pub fn new(
+                _api_url: Option<&str>,
+                _openhuman_dir: Option<std::path::PathBuf>,
+                _secrets_encrypt: bool,
+                _model: &str,
+                _dimensions: usize,
+            ) -> Self {
+                Self
+            }
+
+            pub async fn embed_one(&self, _text: &str) -> anyhow::Result<Vec<f32>> {
+                anyhow::bail!("cloud embeddings not available in standalone mode")
+            }
+        }
     }
 }

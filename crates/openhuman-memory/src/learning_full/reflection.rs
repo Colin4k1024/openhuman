@@ -144,7 +144,7 @@ impl ReflectionHook {
                     tc.name,
                     tc.success,
                     tc.duration_ms,
-                    truncate(&tc.output_summary, 100)
+                    truncate(tc.output_summary.as_deref().unwrap_or(""), 100)
                 ));
             }
             prompt.push('\n');

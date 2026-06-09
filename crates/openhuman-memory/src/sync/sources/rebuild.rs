@@ -16,7 +16,6 @@ use anyhow::Result;
 
 use crate::config::Config;
 use crate::orchestration::tree_source::get_or_create_source_tree;
-use crate::store::content::paths::slugify_source_id;
 use crate::store::content::raw::raw_source_dir;
 use crate::store::trees::types::{TreeKind, INPUT_TOKEN_BUDGET};
 use crate::sync::sources::audit::{

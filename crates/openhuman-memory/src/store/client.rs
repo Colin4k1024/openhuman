@@ -11,9 +11,9 @@ use serde_json::json;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::embeddings::{self, EmbeddingProvider};
-use crate::bridge::memory_traits::ingestion::queue as ingestion_queue;
-use crate::bridge::memory_traits::ingestion::{
+use crate::embeddings::EmbeddingProvider;
+use crate::orchestration::ingestion::queue as ingestion_queue;
+use crate::orchestration::ingestion::{
     IngestionJob, IngestionQueue, IngestionState, MemoryIngestionConfig, MemoryIngestionRequest,
     MemoryIngestionResult,
 };
@@ -84,7 +84,6 @@ impl MemoryClient {
     /// initialization fails.
     pub fn new_local() -> Result<Self, String> {
         let workspace_dir = crate::config::default_root_openhuman_dir()
-            .map_err(|e| e.to_string())?
             .join("workspace");
         Self::from_workspace_dir(workspace_dir)
     }

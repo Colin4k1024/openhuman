@@ -1,4 +1,5 @@
 //! SQLite-backed persistence for ingested chunks (Phase 1 / issue #707).
+#![allow(dead_code)]
 //!
 //! The store lives at `<workspace>/memory_tree/chunks.db`. Schema is applied
 //! lazily on first access via `with_connection`, so the DB is created on
@@ -416,6 +417,7 @@ pub fn upsert_chunks(config: &Config, chunks: &[Chunk]) -> Result<usize> {
 }
 
 /// Upsert chunks using an existing transaction, preserving previously stored embeddings.
+#[allow(dead_code)]
 pub(crate) fn upsert_chunks_tx(tx: &Transaction<'_>, chunks: &[Chunk]) -> Result<usize> {
     if chunks.is_empty() {
         return Ok(0);

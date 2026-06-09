@@ -325,7 +325,7 @@ impl ProviderContext {
                     toolkit = %self.toolkit,
                     "[composio:provider_context] execute: direct variant"
                 );
-                direct_execute(&direct, action, arguments, &live_config.composio.entity_id).await
+                direct_execute(&direct, action, arguments, live_config.composio.entity_id.as_deref().unwrap_or("")).await
             }
         };
 
@@ -354,7 +354,7 @@ impl ProviderContext {
     /// `ComposioClient` and have not yet been ported to the factory.
     /// Direct-mode users hit this path as a hard error rather than
     /// silently routing through the wrong tenant.
-    pub async fn backend_client(&self) -> anyhow::Result<ComposioClient> {
+    pub async fn backend_client(&self) -> anyhow::Result<Box<dyn ComposioClient>> {
         // [#1710 Wave 4] Reload config fresh per call so a mid-session
         // `composio.mode` toggle takes effect immediately. The Arc<Config>
         // snapshot held by `self` was taken at agent-init time and is

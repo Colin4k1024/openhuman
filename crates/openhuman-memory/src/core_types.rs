@@ -83,13 +83,30 @@ pub mod logging {
 
 /// Shutdown helpers (stubs).
 pub mod shutdown {
-    pub fn register(_f: impl FnOnce() + Send + 'static) {}
+    pub fn register<F, Fut>(_f: F)
+    where
+        F: Fn() -> Fut + Send + 'static,
+        Fut: std::future::Future<Output = ()> + Send + 'static,
+    {
+    }
 }
 
 /// Observability helpers (stubs).
 pub mod observability {
-    pub fn report_error(_msg: &str) {}
-    pub fn report_error_or_expected(_msg: &str, _expected: bool) {}
+    /// Report an error with context tags.
+    /// Signature mirrors the real app: (error, domain, operation, tags).
+    pub fn report_error(
+        _err: impl std::fmt::Display,
+        _domain: &str,
+        _operation: &str,
+        _tags: &[(&str, &str)],
+    ) {}
+    pub fn report_error_or_expected(
+        _msg: &str,
+        _domain: &str,
+        _operation: &str,
+        _tags: &[(&str, &str)],
+    ) {}
 }
 
 /// Event bus compat (remaining references).
