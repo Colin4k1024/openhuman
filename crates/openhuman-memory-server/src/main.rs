@@ -66,8 +66,14 @@ async fn main() -> anyhow::Result<()> {
     let memory = UnifiedMemory::new(&workspace, embedder, None)
         .with_context(|| format!("open UnifiedMemory at {}", workspace.display()))?;
 
+    let config = openhuman_memory::config::Config {
+        workspace_dir: workspace.clone(),
+        ..Default::default()
+    };
+
     let state = Arc::new(AppState {
         memory,
+        config,
         workspace_dir: workspace.clone(),
     });
 

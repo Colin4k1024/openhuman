@@ -24,8 +24,13 @@ async fn start_server() -> (String, TempDir) {
     let embedder = default_embedding_provider();
     let memory = UnifiedMemory::new(tmp.path(), embedder, None).expect("UnifiedMemory::new");
 
+    let config = openhuman_memory::config::Config {
+        workspace_dir: tmp.path().to_path_buf(),
+        ..Default::default()
+    };
     let state = Arc::new(AppState {
         memory,
+        config,
         workspace_dir: tmp.path().to_path_buf(),
     });
 

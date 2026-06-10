@@ -26,6 +26,8 @@ use auth::{bearer_auth, ExpectedToken};
 pub struct AppState {
     /// The unified memory store (documents + KV + graph + vectors).
     pub memory: UnifiedMemory,
+    /// Memory system configuration.
+    pub config: openhuman_memory::config::Config,
     /// Workspace root directory (used to build entity paths).
     pub workspace_dir: PathBuf,
 }

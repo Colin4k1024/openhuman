@@ -2,6 +2,7 @@
 
 pub mod documents;
 pub mod entities;
+pub mod graph;
 pub mod health;
 pub mod kv;
 pub mod score;
@@ -70,6 +71,13 @@ async fn dispatch(state: &AppState, method: &str, params: Value) -> Result<Value
         "memory.list_entities" => entities::handle_list_entities(state, params).await,
         "memory.get_entity" => entities::handle_get_entity(state, params).await,
         "memory.put_entity" => entities::handle_put_entity(state, params).await,
+
+        // Graph
+        "memory.graph_neighbors" => graph::handle_graph_neighbors(state, params).await,
+        "memory.graph_node" => graph::handle_graph_node(state, params).await,
+        "memory.graph_nodes" => graph::handle_graph_nodes(state, params).await,
+        "memory.graph_co_occurring" => graph::handle_graph_co_occurring(state, params).await,
+        "memory.graph_discover" => graph::handle_graph_discover(state, params).await,
 
         other => Err(RpcError::method_not_found(other)),
     }
