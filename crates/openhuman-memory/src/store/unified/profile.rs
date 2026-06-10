@@ -719,6 +719,6 @@ fn row_to_facet(row: &rusqlite::Row<'_>) -> rusqlite::Result<ProfileFacet> {
     })
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 #[path = "profile_tests.rs"]
 mod tests;

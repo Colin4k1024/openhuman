@@ -183,7 +183,7 @@ impl ObsidianRepresentable for Person {
 // that historically used `StoredMemoryDocument` should land its body as a
 // raw md file and reference it via path.
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 mod tests {
     use super::*;
     use crate::store::chunks::types::{Metadata, SourceKind};

@@ -37,9 +37,13 @@ tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 uuid = { version = "1", features = ["v4"] }
 
+# Optional deps for gated modules
+notify = { version = "6", optional = true }
+notify-debouncer-mini = { version = "0.4", optional = true }
+
 [features]
 __compile_store = []
-__full_app = []
+__full_app = ["notify", "notify-debouncer-mini"]
 
 [dev-dependencies]
 tempfile = "3"

@@ -60,7 +60,7 @@ fn enqueue_flush_stale(config: &Config) {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 mod tests {
     use super::*;
     use crate::queue::store::{

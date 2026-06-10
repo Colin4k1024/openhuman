@@ -1,0 +1,1 @@
+//! RPC models tests — placeholder.

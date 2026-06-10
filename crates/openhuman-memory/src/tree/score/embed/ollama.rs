@@ -237,7 +237,7 @@ impl Embedder for OllamaEmbedder {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 mod tests {
     use super::*;
     use axum::{extract::Json, http::StatusCode, routing::post, Router};

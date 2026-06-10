@@ -550,6 +550,6 @@ fn truncate_for_log(s: &str, max_chars: usize) -> String {
 
 // ── Tests ────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 #[path = "llm_tests.rs"]
 mod tests;

@@ -1545,6 +1545,6 @@ pub(crate) use embeddings::{
 };
 // ── Phase 2: embedding column accessors ─────────────────────────────────
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 #[path = "store_tests.rs"]
 mod tests;

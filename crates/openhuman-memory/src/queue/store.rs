@@ -550,7 +550,7 @@ fn backoff_ms(attempts_so_far: u32) -> i64 {
     raw.min(RETRY_CAP_MS)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 mod tests {
     use super::*;
     use crate::queue::types::{

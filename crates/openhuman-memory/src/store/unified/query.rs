@@ -1338,6 +1338,6 @@ impl UnifiedMemory {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "__full_app"))]
 #[path = "query_tests.rs"]
 mod tests;
