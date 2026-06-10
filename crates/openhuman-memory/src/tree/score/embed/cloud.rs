@@ -35,22 +35,19 @@ pub struct CloudEmbedder {
 }
 
 impl CloudEmbedder {
-    /// Build a cloud embedder using the same backend resolution as the
-    /// main embeddings path: `api_url` falls back to
-    /// [`effective_api_url`](crate::api::config::effective_api_url) and
-    /// the workspace dir comes from `config.workspace_dir` so the auth
-    /// service finds the user's session JWT.
-    pub fn new(config: &Config) -> Self {
+    /// Build a cloud embedder, reading the API key from `OPENAI_API_KEY`.
+    ///
+    /// Returns an error if the environment variable is not set or is empty.
+    pub fn new(config: &Config) -> Result<Self> {
         let openhuman_dir = config.config_path.parent().map(std::path::PathBuf::from);
-        Self {
-            inner: OpenHumanCloudEmbedding::new(
-                None,
-                openhuman_dir,
-                config.secrets.encrypt,
-                DEFAULT_CLOUD_EMBEDDING_MODEL,
-                DEFAULT_CLOUD_EMBEDDING_DIMENSIONS,
-            ),
-        }
+        let inner = OpenHumanCloudEmbedding::from_env(
+            None,
+            openhuman_dir,
+            config.secrets.encrypt,
+            DEFAULT_CLOUD_EMBEDDING_MODEL,
+            DEFAULT_CLOUD_EMBEDDING_DIMENSIONS,
+        )?;
+        Ok(Self { inner })
     }
 }
 
@@ -93,8 +90,10 @@ mod tests {
 
     #[test]
     fn name_is_cloud() {
+        // Set a dummy key so from_env() succeeds in the test environment.
+        std::env::set_var("OPENAI_API_KEY", "test-key");
         let (_tmp, cfg) = test_config();
-        let e = CloudEmbedder::new(&cfg);
+        let e = CloudEmbedder::new(&cfg).expect("CloudEmbedder::new should succeed with key set");
         assert_eq!(e.name(), "cloud");
     }
 }

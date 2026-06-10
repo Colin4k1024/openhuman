@@ -240,19 +240,23 @@ pub struct Config {
     pub memory_sources: serde_json::Value,
     /// Learning configuration.
     pub learning: LearningConfig,
-    /// Path to the config.toml file (used by `save()` and test helpers).
+    /// Path to the config.json file (used by `save()` and test helpers).
     #[serde(skip)]
     pub config_path: std::path::PathBuf,
-    /// Composio integration configuration (stub).
+    /// Composio integration configuration (only used by full-app modules).
+    #[cfg(feature = "__full_app")]
     #[serde(default)]
     pub composio: ComposioConfig,
-    /// Backend API URL.
+    /// Backend API URL (only used by full-app modules).
+    #[cfg(feature = "__full_app")]
     #[serde(default)]
     pub api_url: Option<String>,
-    /// Backend API key.
+    /// Backend API key (only used by full-app modules).
+    #[cfg(feature = "__full_app")]
     #[serde(default)]
     pub api_key: Option<String>,
-    /// Custom LLM inference endpoint (OpenAI-compatible).
+    /// Custom LLM inference endpoint (only used by full-app modules).
+    #[cfg(feature = "__full_app")]
     #[serde(default)]
     pub inference_url: Option<String>,
     /// Runtime configuration.
@@ -281,10 +285,14 @@ impl Default for Config {
             memory_sources: Vec::new(),
             #[cfg(not(feature = "__full_app"))]
             memory_sources: serde_json::Value::Null,
-            config_path: data_dir.join("config.toml"),
+            config_path: data_dir.join("config.json"),
+            #[cfg(feature = "__full_app")]
             composio: ComposioConfig::default(),
+            #[cfg(feature = "__full_app")]
             api_url: None,
+            #[cfg(feature = "__full_app")]
             api_key: None,
+            #[cfg(feature = "__full_app")]
             inference_url: None,
             runtime: RuntimeConfig::default(),
         }
@@ -354,7 +362,7 @@ impl Config {
     /// Load config from the default location or initialise defaults.
     /// Mirrors `Config::load_or_init()` from the main app.
     pub async fn load_or_init() -> anyhow::Result<Self> {
-        let config_path = default_data_dir().join("config.toml");
+        let config_path = default_data_dir().join("config.json");
         if config_path.exists() {
             let contents = tokio::fs::read_to_string(&config_path).await?;
             // Try JSON first (standalone), then fall back to defaults.
@@ -421,12 +429,12 @@ pub mod rpc {
     static GLOBAL_CONFIG: OnceCell<Arc<Config>> = OnceCell::new();
 
     /// Set the global config (called once at startup).
-    pub fn set_config(config: Config) {
+    pub(crate) fn set_config(config: Config) {
         let _ = GLOBAL_CONFIG.set(Arc::new(config));
     }
 
     /// Get the global config.
-    pub fn get_config() -> Arc<Config> {
+    pub(crate) fn get_config() -> Arc<Config> {
         GLOBAL_CONFIG
             .get()
             .cloned()
@@ -436,18 +444,18 @@ pub mod rpc {
     /// Load config with timeout (async, returns a cloned owned Config).
     /// In the full app this waits for config to be ready; here it returns immediately.
     /// Returns an owned `Config` so call sites can mutate and save.
-    pub async fn load_config_with_timeout() -> Result<Config, String> {
+    pub(crate) async fn load_config_with_timeout() -> Result<Config, String> {
         Ok((*get_config()).clone())
     }
 
     /// Alias for synchronous access.
-    pub fn config() -> Arc<Config> {
+    pub(crate) fn config() -> Arc<Config> {
         get_config()
     }
 
     /// Reload config snapshot (async stub).
     /// Accepts a reference to the current config to mirror the real-app signature.
-    pub async fn reload_config_snapshot_with_timeout(
+    pub(crate) async fn reload_config_snapshot_with_timeout(
         _current: &std::sync::Arc<Config>,
     ) -> Result<Config, String> {
         Ok((*get_config()).clone())
@@ -480,7 +488,7 @@ pub mod schema {
 
 /// Config ops stubs.
 pub mod ops {
-    pub use super::rpc::{config, get_config, load_config_with_timeout};
+    pub(crate) use super::rpc::{config, get_config, load_config_with_timeout};
 }
 
 /// Stub for the LocalAiService that handles local LLM inference.

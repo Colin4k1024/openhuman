@@ -76,26 +76,29 @@ fn main() -> anyhow::Result<()> {
 ### Store and Retrieve Chunks
 
 ```rust
-use openhuman_memory::config::Config;
-use openhuman_memory::store::chunks::store::{upsert_chunks, with_connection};
+use chrono::Utc;
 use openhuman_memory::store::chunks::types::{Chunk, Metadata, SourceKind};
 
-fn store_text(config: &Config, text: &str, source: &str) -> anyhow::Result<()> {
-    let chunk = Chunk {
-        id: uuid::Uuid::new_v4().to_string(),
-        text: text.to_string(),
+fn make_chunk(text: &str, source_id: &str) -> Chunk {
+    let now = Utc::now();
+    Chunk {
+        id: format!("chunk-{}", uuid::Uuid::new_v4()),
+        content: text.to_string(),
+        metadata: Metadata {
+            source_kind: SourceKind::Chat,
+            source_id: source_id.to_string(),
+            owner: String::new(),
+            timestamp: now,
+            time_range: (now, now),
+            tags: vec![],
+            source_ref: None,
+            path_scope: None,
+        },
         token_count: (text.len() / 4) as u32,
-        source_id: source.to_string(),
-        source_kind: SourceKind::Chat,
-        metadata: Metadata::default(),
-        ..Default::default()
-    };
-
-    with_connection(config, |conn| {
-        upsert_chunks(conn, &[chunk])
-    })?;
-
-    Ok(())
+        seq_in_source: 0,
+        created_at: now,
+        partial_message: false,
+    }
 }
 ```
 

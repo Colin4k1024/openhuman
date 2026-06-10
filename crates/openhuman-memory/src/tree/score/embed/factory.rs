@@ -92,7 +92,7 @@ pub fn build_embedder_from_config(config: &Config) -> Result<Box<dyn Embedder>> 
                 "[memory_tree::embed::factory] read → cloud (Voyage) — flip \
                  'Memory embeddings' in Local AI Settings to switch to local"
             );
-            Box::new(CloudEmbedder::new(config))
+            Box::new(CloudEmbedder::new(config)?)
         }
         EmbedderChoice::NoProvider => {
             log::warn!(
@@ -233,7 +233,7 @@ pub fn build_write_embedder(config: &Config) -> Result<Option<Box<dyn Embedder>>
         }
         EmbedderChoice::Cloud => {
             clear_semantic_recall_degraded();
-            Some(Box::new(CloudEmbedder::new(config)))
+            Some(Box::new(CloudEmbedder::new(config)?))
         }
         EmbedderChoice::NoProvider => {
             log::warn!(
