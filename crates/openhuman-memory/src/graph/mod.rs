@@ -1,33 +1,27 @@
-//! Memory graph — placeholder over the existing tree entity index.
+//! Memory graph — knowledge graph with derived and explicit relations.
 //!
-//! The premise: a separate triple store (`unified::graph`) is redundant
-//! when every chunk already lands an entity row in `mem_tree_entity_index`.
-//! The graph IS the tree mapped out — two entities co-occurring on the
-//! same leaf form an edge.
+//! Two layers:
 //!
-//! This module derives those edges on demand instead of writing a parallel
-//! storage table. It's a placeholder while the existing `unified::graph`
-//! callers (ingestion's LLM-extracted triples + the public client RPC)
-//! get migrated or retired; the LLM-extracted (subject, predicate, object)
-//! triple surface is intentionally not covered here.
+//! 1. **Derived** (`query.rs`): co-occurrence edges computed on-the-fly from
+//!    `mem_tree_entity_index`. Read-only, no extra tables.
 //!
-//! ## API
+//! 2. **Persistent** (`persistent_store.rs`): explicit nodes + typed edges
+//!    stored in `mem_graph_nodes` / `mem_graph_edges` tables. Writable.
+//!    Supports typed relations (works_at, located_in, follows, etc.).
 //!
-//! - [`co_occurring_entities`] — for a subject entity, return every other
-//!   entity that has appeared on the same node, with a co-occurrence
-//!   count.
-//! - [`neighbors`] — convenience: just the entity ids, no counts.
-//!
-//! ## Layer rules
-//!
-//! - Reads from `mem_tree_entity_index` via
-//!   `memory_store::chunks::store::with_connection`. No writes.
-//! - No new tables, no new schema. Anything you can't derive from the
-//!   entity index is intentionally out of scope here.
+//! 3. **Discovery** (`discovery.rs`): automatic relation extraction from chunks
+//!    — co-occurrence, temporal, and pattern-based rules.
 
+pub mod discovery;
+pub mod persistent_store;
 pub mod query;
 pub mod types;
 
+pub use discovery::{discover_and_persist, discover_co_occurrences, discover_pattern_relations};
+pub use persistent_store::{
+    delete_node, edges_from, edges_involving, get_node, increment_edge_weight, list_nodes,
+    remove_edge, upsert_edge, upsert_node, EvidenceRef, GraphEdgePersistent, GraphNode,
+};
 pub use query::{co_occurring_entities, neighbors};
 pub use types::GraphEdge;
 
