@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/openhuman-embeddings", "crates/openhuman-memory-types", "crates/openhuman-memory"]
+members = [".", "crates/openhuman-embeddings", "crates/openhuman-memory-types", "crates/openhuman-memory", "crates/openhuman-memory-server", "crates/openhuman-memory-python", "crates/openhuman-memory-wasm"]
 
 [package]
 name = "openhuman"

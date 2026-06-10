@@ -1,0 +1,24 @@
+[package]
+name = "openhuman-memory-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "WASM bindings for openhuman-memory (scoring + entity extraction)"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+openhuman-memory-types = { path = "../openhuman-memory-types" }
+# Core scoring logic extracted for WASM — avoids pulling in rusqlite/tokio/reqwest.
+# Only pure-compute modules: scoring signals, regex extraction, entity resolution.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+wasm-bindgen = "0.2"
+chrono = { version = "0.4", features = ["serde", "wasmbind"] }
+regex = "1"
+aho-corasick = "1"
+unicode-normalization = "0.1"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
