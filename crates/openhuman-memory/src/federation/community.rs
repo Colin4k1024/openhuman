@@ -10,7 +10,7 @@
 use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 
-use super::aggregation::{AggregateResult, AggregationConfig, PatternVector, secure_aggregate_vectors};
+use super::aggregation::{AggregateResult, AggregationConfig, PatternVector, aggregate_vectors};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -106,7 +106,7 @@ impl AggregationRound {
             );
         }
 
-        let result = secure_aggregate_vectors(&self.collected_vectors, &self.config)?;
+        let result = aggregate_vectors(&self.collected_vectors, &self.config)?;
         let user_count = result.participant_count;
 
         let patterns: Vec<CommunityPattern> = self

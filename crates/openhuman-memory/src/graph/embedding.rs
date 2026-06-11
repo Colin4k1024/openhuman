@@ -120,19 +120,26 @@ pub fn train_embeddings(config: &Config, transe_config: &TransEConfig) -> Result
         }
 
         // Collect unique entities and relations
+        use std::collections::HashMap;
         let mut entities: Vec<String> = Vec::new();
         let mut relations: Vec<String> = Vec::new();
-        for t in &triples {
-            if !entities.contains(&t.head) {
-                entities.push(t.head.clone());
-            }
-            if !entities.contains(&t.tail) {
-                entities.push(t.tail.clone());
-            }
-            if !relations.contains(&t.relation) {
-                relations.push(t.relation.clone());
+        {
+            let mut entity_set: HashMap<&str, ()> = HashMap::new();
+            let mut relation_set: HashMap<&str, ()> = HashMap::new();
+            for t in &triples {
+                if entity_set.insert(t.head.as_str(), ()).is_none() {
+                    entities.push(t.head.clone());
+                }
+                if entity_set.insert(t.tail.as_str(), ()).is_none() {
+                    entities.push(t.tail.clone());
+                }
+                if relation_set.insert(t.relation.as_str(), ()).is_none() {
+                    relations.push(t.relation.clone());
+                }
             }
         }
+        let entity_idx: HashMap<&str, usize> = entities.iter().enumerate().map(|(i, e)| (e.as_str(), i)).collect();
+        let relation_idx: HashMap<&str, usize> = relations.iter().enumerate().map(|(i, r)| (r.as_str(), i)).collect();
 
         let dim = transe_config.dimension;
         let mut rng = rand::thread_rng();
@@ -156,9 +163,9 @@ pub fn train_embeddings(config: &Config, transe_config: &TransEConfig) -> Result
         // Training loop
         for _epoch in 0..transe_config.epochs {
             for triple in &triples {
-                let h_idx = entities.iter().position(|e| e == &triple.head).unwrap();
-                let t_idx = entities.iter().position(|e| e == &triple.tail).unwrap();
-                let r_idx = relations.iter().position(|r| r == &triple.relation).unwrap();
+                let h_idx = entity_idx[triple.head.as_str()];
+                let t_idx = entity_idx[triple.tail.as_str()];
+                let r_idx = relation_idx[triple.relation.as_str()];
 
                 // Positive distance: ||h + r - t||
                 let pos_dist = distance(&entity_vecs[h_idx], &relation_vecs[r_idx], &entity_vecs[t_idx]);

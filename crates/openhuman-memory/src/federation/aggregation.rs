@@ -141,14 +141,10 @@ pub fn aggregate_shares(
 
 // ─── Multi-user aggregation workflow ─────────────────────────────────────────
 
-/// Simulate the full secure aggregation protocol:
-/// 1. Each user splits their vector into shares.
-/// 2. Each user sends one designated share to the server.
-/// 3. Server sums the collected shares.
-///
-/// The result is the SUM of all users' original vectors (useful for
-/// computing average patterns: divide by participant count).
-pub fn secure_aggregate_vectors(
+/// Aggregate pattern vectors by direct summation. Privacy is provided by the transport
+/// layer (E2E encryption), not by this function. For true secure aggregation with secret
+/// sharing, use `split_into_shares` + `aggregate_shares` with threshold collection.
+pub fn aggregate_vectors(
     user_vectors: &[PatternVector],
     config: &AggregationConfig,
 ) -> Result<AggregateResult> {
@@ -273,7 +269,7 @@ mod tests {
         ];
 
         let config = AggregationConfig { min_participants: 3, total_shares: 3 };
-        let result = secure_aggregate_vectors(&vectors, &config).unwrap();
+        let result = aggregate_vectors(&vectors, &config).unwrap();
 
         assert_eq!(result.aggregate, vec![2.0, 2.0, 2.0]);
         assert_eq!(result.participant_count, 3);

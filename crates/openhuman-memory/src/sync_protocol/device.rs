@@ -5,11 +5,12 @@
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
+use rand::rngs::OsRng;
+use x25519_dalek::{PublicKey, StaticSecret};
 
 use crate::config::Config;
 
@@ -87,23 +88,18 @@ pub fn get_or_create_identity(config: &Config) -> Result<DeviceIdentity> {
             last_seen: Utc::now(),
         })
     } else {
-        let identity = generate_new_identity(config)?;
-        Ok(identity)
+        generate_new_identity(config)
     }
 }
 
 /// Generate a fresh X25519 keypair and persist it.
 fn generate_new_identity(config: &Config) -> Result<DeviceIdentity> {
-    let mut private_bytes = [0u8; 32];
-    rand::thread_rng().fill_bytes(&mut private_bytes);
+    // x25519-dalek handles clamping internally via StaticSecret
+    let secret = StaticSecret::random_from_rng(OsRng);
+    let public = PublicKey::from(&secret);
 
-    // X25519 clamping (per RFC 7748)
-    private_bytes[0] &= 248;
-    private_bytes[31] &= 127;
-    private_bytes[31] |= 64;
-
-    // Compute public key: scalar multiplication of private key with basepoint
-    let public_bytes = x25519_base_point_mul(&private_bytes);
+    let public_bytes: [u8; 32] = *public.as_bytes();
+    let private_bytes: [u8; 32] = *secret.as_bytes();
 
     let public_hex = hex::encode(public_bytes);
     let private_hex = hex::encode(private_bytes);
@@ -111,7 +107,7 @@ fn generate_new_identity(config: &Config) -> Result<DeviceIdentity> {
     // device_id = first 16 hex chars of SHA-256(public_key)
     let device_id = {
         let mut h = Sha256::new();
-        h.update(&public_bytes);
+        h.update(public_bytes);
         hex::encode(h.finalize())[..16].to_string()
     };
 
@@ -216,231 +212,21 @@ fn default_display_name() -> String {
         .unwrap_or_else(|| "Unknown Device".into())
 }
 
-/// Public wrapper for basepoint multiplication (used by crypto.rs).
+/// Public wrapper: compute the X25519 public key for a given private scalar.
+///
+/// Used by `crypto.rs` tests to set up test keypairs.
 pub(crate) fn x25519_base_point_mul_pub(scalar: &[u8; 32]) -> [u8; 32] {
-    x25519_base_point_mul(scalar)
+    let secret = StaticSecret::from(*scalar);
+    *PublicKey::from(&secret).as_bytes()
 }
 
-/// Public wrapper for scalar multiplication (used by crypto.rs for key agreement).
+/// Public wrapper: X25519 scalar multiplication (key agreement).
+///
+/// Used by `crypto.rs`.
 pub(crate) fn x25519_scalar_mul_pub(scalar: &[u8; 32], u_bytes: &[u8; 32]) -> [u8; 32] {
-    x25519_scalar_mul(scalar, u_bytes)
-}
-
-/// Minimal X25519 basepoint multiplication (constant-time is not critical here
-/// since this runs only at key generation, not in a hot path).
-/// In production, use the `x25519-dalek` crate; this is a self-contained fallback.
-fn x25519_base_point_mul(scalar: &[u8; 32]) -> [u8; 32] {
-    // Basepoint for Curve25519: u = 9
-    let mut u = [0u8; 32];
-    u[0] = 9;
-    x25519_scalar_mul(scalar, &u)
-}
-
-/// RFC 7748 scalar multiplication on Curve25519 (Montgomery ladder).
-fn x25519_scalar_mul(scalar: &[u8; 32], u_bytes: &[u8; 32]) -> [u8; 32] {
-    // Field element: 256-bit number mod p = 2^255 - 19
-    // Using u128 pairs for the arithmetic is simplest for correctness.
-    // This is a textbook implementation — NOT constant-time.
-    // For production, replace with `x25519-dalek`.
-
-    let p: [u64; 4] = [
-        0xFFFFFFFFFFFFFFED,
-        0xFFFFFFFFFFFFFFFF,
-        0xFFFFFFFFFFFFFFFF,
-        0x7FFFFFFFFFFFFFFF,
-    ];
-
-    fn decode(bytes: &[u8; 32]) -> [u64; 4] {
-        let mut r = [0u64; 4];
-        for i in 0..4 {
-            let mut b = [0u8; 8];
-            b.copy_from_slice(&bytes[i * 8..(i + 1) * 8]);
-            r[i] = u64::from_le_bytes(b);
-        }
-        r
-    }
-
-    fn encode(v: &[u64; 4]) -> [u8; 32] {
-        let mut r = [0u8; 32];
-        for i in 0..4 {
-            r[i * 8..(i + 1) * 8].copy_from_slice(&v[i].to_le_bytes());
-        }
-        r
-    }
-
-    fn add_mod(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-        let mut r = [0u64; 4];
-        let mut carry = 0u64;
-        for i in 0..4 {
-            let (s1, c1) = a[i].overflowing_add(b[i]);
-            let (s2, c2) = s1.overflowing_add(carry);
-            r[i] = s2;
-            carry = c1 as u64 + c2 as u64;
-        }
-        // Reduce if >= p
-        let mut borrow = 0i64;
-        let mut tmp = [0u64; 4];
-        for i in 0..4 {
-            let diff = r[i] as i128 - p[i] as i128 - borrow as i128;
-            tmp[i] = diff as u64;
-            borrow = if diff < 0 { 1 } else { 0 };
-        }
-        if borrow == 0 { tmp } else { r }
-    }
-
-    fn sub_mod(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-        let mut borrow = 0i64;
-        let mut r = [0u64; 4];
-        for i in 0..4 {
-            let diff = a[i] as i128 - b[i] as i128 - borrow as i128;
-            r[i] = diff as u64;
-            borrow = if diff < 0 { 1 } else { 0 };
-        }
-        if borrow != 0 {
-            let mut carry = 0u64;
-            for i in 0..4 {
-                let (s, c) = r[i].overflowing_add(p[i]);
-                let (s2, c2) = s.overflowing_add(carry);
-                r[i] = s2;
-                carry = c as u64 + c2 as u64;
-            }
-        }
-        r
-    }
-
-    fn mul_mod(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-        // Schoolbook multiplication → reduce
-        let mut product = [0u128; 8];
-        for i in 0..4 {
-            let mut carry = 0u128;
-            for j in 0..4 {
-                let v = product[i + j] + (a[i] as u128) * (b[j] as u128) + carry;
-                product[i + j] = v & 0xFFFFFFFFFFFFFFFF;
-                carry = v >> 64;
-            }
-            product[i + 4] = carry;
-        }
-        // Barrett-like reduction: divide by p ≈ 2^255
-        // Simplified: just do repeated subtraction via shift (slow but correct)
-        reduce_512(&product, p)
-    }
-
-    fn reduce_512(prod: &[u128; 8], p: &[u64; 4]) -> [u64; 4] {
-        // Convert to big number, then mod p
-        // For correctness (not speed), we'll use a simple approach
-        let mut result = [0u64; 4];
-        for i in (0..8).rev() {
-            // Shift result left by 64 bits
-            let mut shifted = [0u64; 4];
-            shifted[1] = result[0];
-            shifted[2] = result[1];
-            shifted[3] = result[2];
-            // lost: result[3] — but if we're doing this right it should be < p already
-            shifted[0] = prod[i] as u64;
-            result = shifted;
-            // Reduce: while result >= p, subtract p
-            // Since this can be at most ~2p after each step...
-            loop {
-                let mut borrow = 0i64;
-                let mut tmp = [0u64; 4];
-                for j in 0..4 {
-                    let diff = result[j] as i128 - p[j] as i128 - borrow as i128;
-                    tmp[j] = diff as u64;
-                    borrow = if diff < 0 { 1 } else { 0 };
-                }
-                if borrow != 0 {
-                    break;
-                }
-                result = tmp;
-            }
-        }
-        result
-    }
-
-    fn inv_mod(a: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-        // Fermat's little theorem: a^(-1) = a^(p-2) mod p
-        let mut pm2 = *p;
-        // p - 2: subtract 2 from the first limb
-        pm2[0] -= 2;
-        pow_mod(a, &pm2, p)
-    }
-
-    fn pow_mod(base: &[u64; 4], exp: &[u64; 4], p: &[u64; 4]) -> [u64; 4] {
-        let mut result = [0u64; 4];
-        result[0] = 1; // 1
-        let mut b = *base;
-        for i in 0..4 {
-            for bit in 0..64 {
-                if (exp[i] >> bit) & 1 == 1 {
-                    result = mul_mod(&result, &b, p);
-                }
-                b = mul_mod(&b, &b, p);
-            }
-        }
-        result
-    }
-
-    // Clamp scalar
-    let mut k = *scalar;
-    k[0] &= 248;
-    k[31] &= 127;
-    k[31] |= 64;
-
-    let mut u_coord = decode(u_bytes);
-    u_coord[3] &= 0x7FFFFFFFFFFFFFFF; // Clear top bit
-
-    // Montgomery ladder
-    let mut x_1 = u_coord;
-    let mut x_2 = [0u64; 4]; x_2[0] = 1;
-    let mut z_2 = [0u64; 4];
-    let mut x_3 = u_coord;
-    let mut z_3 = [0u64; 4]; z_3[0] = 1;
-
-    let a24 = [121666u64, 0, 0, 0]; // (A+2)/4 = 121666
-
-    let mut swap = 0u64;
-
-    for t in (0..255).rev() {
-        let byte_idx = t / 8;
-        let bit_idx = t % 8;
-        let k_t = ((k[byte_idx] >> bit_idx) & 1) as u64;
-
-        let do_swap = swap ^ k_t;
-        // Conditional swap
-        if do_swap != 0 {
-            std::mem::swap(&mut x_2, &mut x_3);
-            std::mem::swap(&mut z_2, &mut z_3);
-        }
-        swap = k_t;
-
-        let a = add_mod(&x_2, &z_2, &p);
-        let aa = mul_mod(&a, &a, &p);
-        let b_val = sub_mod(&x_2, &z_2, &p);
-        let bb = mul_mod(&b_val, &b_val, &p);
-        let e = sub_mod(&aa, &bb, &p);
-        let c = add_mod(&x_3, &z_3, &p);
-        let d = sub_mod(&x_3, &z_3, &p);
-        let da = mul_mod(&d, &a, &p);
-        let cb = mul_mod(&c, &b_val, &p);
-        let da_cb_sum = add_mod(&da, &cb, &p);
-        x_3 = mul_mod(&da_cb_sum, &da_cb_sum, &p);
-        let da_cb_diff = sub_mod(&da, &cb, &p);
-        let sq = mul_mod(&da_cb_diff, &da_cb_diff, &p);
-        z_3 = mul_mod(&x_1, &sq, &p);
-        x_2 = mul_mod(&aa, &bb, &p);
-        let e_a24 = mul_mod(&e, &a24, &p);
-        let aa_e_a24 = add_mod(&aa, &e_a24, &p);
-        z_2 = mul_mod(&e, &aa_e_a24, &p);
-    }
-
-    if swap != 0 {
-        std::mem::swap(&mut x_2, &mut x_3);
-        std::mem::swap(&mut z_2, &mut z_3);
-    }
-
-    let z_inv = inv_mod(&z_2, &p);
-    let result = mul_mod(&x_2, &z_inv, &p);
-    encode(&result)
+    let secret = StaticSecret::from(*scalar);
+    let public = PublicKey::from(*u_bytes);
+    *secret.diffie_hellman(&public).as_bytes()
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -491,10 +277,6 @@ mod tests {
         get_or_create_identity(&cfg).unwrap();
         let pk = get_private_key(&cfg).unwrap();
         assert_eq!(pk.len(), 32);
-        // Verify clamping
-        assert_eq!(pk[0] & 7, 0);
-        assert_eq!(pk[31] & 128, 0);
-        assert_ne!(pk[31] & 64, 0);
     }
 
     #[test]

@@ -10,10 +10,20 @@ use rand::Rng;
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
 
+use once_cell::sync::Lazy;
+use regex::Regex;
+
 use crate::config::Config;
 use crate::store::chunks::store::with_connection;
 
 use super::local_patterns::Pattern;
+
+// ─── Static regexes (compiled once) ─────────────────────────────────────────
+
+static EMAIL_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b").unwrap());
+static PHONE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\b\d[\d\s\-().]{6,}\d\b").unwrap());
+static NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b").unwrap());
+static SINGLE_CAP_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\b[A-Z][a-z]{2,}\b").unwrap());
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 
@@ -139,17 +149,14 @@ fn generalize_text(text: &str) -> String {
     let mut result = text.to_string();
 
     // Email pattern
-    let email_re = regex::Regex::new(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b").unwrap();
-    result = email_re.replace_all(&result, "[EMAIL]").to_string();
+    result = EMAIL_RE.replace_all(&result, "[EMAIL]").to_string();
 
     // Phone-like numbers (7+ digits)
-    let phone_re = regex::Regex::new(r"\b\d[\d\s\-().]{6,}\d\b").unwrap();
-    result = phone_re.replace_all(&result, "[NUMBER]").to_string();
+    result = PHONE_RE.replace_all(&result, "[NUMBER]").to_string();
 
     // Capitalized proper nouns (heuristic: 2+ capitalized words in sequence)
     // Only replace if not common words
-    let name_re = regex::Regex::new(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b").unwrap();
-    result = name_re.replace_all(&result, "[Person]").to_string();
+    result = NAME_RE.replace_all(&result, "[Person]").to_string();
 
     // Single capitalized word that's likely a name (after known entities)
     // Keep common words: Monday, Tuesday, January, etc.
@@ -160,8 +167,7 @@ fn generalize_text(text: &str) -> String {
         "Rust", "Python", "JavaScript", "TypeScript", "React", "Linux", "Windows", "macOS",
     ];
 
-    let single_cap_re = regex::Regex::new(r"\b[A-Z][a-z]{2,}\b").unwrap();
-    result = single_cap_re
+    result = SINGLE_CAP_RE
         .replace_all(&result, |caps: &regex::Captures| {
             let word = &caps[0];
             if common_caps.contains(&word) {

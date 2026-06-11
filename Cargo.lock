@@ -5474,12 +5474,15 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.22.1",
+ "chacha20poly1305",
  "chrono",
  "dirs 5.0.1",
  "futures",
  "futures-util",
  "glob",
  "hex",
+ "hkdf",
+ "hmac 0.12.1",
  "hostname",
  "log",
  "notify",
@@ -5502,6 +5505,7 @@ dependencies = [
  "unicode-normalization",
  "uuid 1.23.1",
  "walkdir",
+ "x25519-dalek",
 ]
 
 [[package]]
