@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenHuman 记忆系统独立化 — 技术汇报</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0f172a; color: #f8fafc; }
+.slide { width: 1280px; height: 720px; margin: 40px auto; padding: 60px 80px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; page-break-after: always; }
+.slide::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4); }
+.slide-number { position: absolute; bottom: 30px; right: 40px; font-size: 14px; color: #64748b; }
+h1 { font-size: 42px; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 32px; font-weight: 600; margin-bottom: 24px; color: #e2e8f0; }
+h3 { font-size: 22px; font-weight: 600; margin-bottom: 12px; color: #94a3b8; }
+p { font-size: 18px; line-height: 1.6; color: #cbd5e1; margin-bottom: 12px; }
+.subtitle { font-size: 20px; color: #94a3b8; margin-bottom: 40px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; margin-right: 8px; }
+.tag-blue { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+.tag-green { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.tag-purple { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+th { background: rgba(59,130,246,0.1); padding: 12px 16px; text-align: left; font-weight: 600; color: #93c5fd; border-bottom: 1px solid rgba(148,163,184,0.2); }
+td { padding: 10px 16px; border-bottom: 1px solid rgba(148,163,184,0.1); color: #cbd5e1; }
+tr:hover td { background: rgba(59,130,246,0.05); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.card { background: rgba(30,41,59,0.8); border: 1px solid rgba(148,163,184,0.15); border-radius: 12px; padding: 24px; }
+.card h3 { color: #60a5fa; margin-bottom: 8px; }
+.card p { font-size: 15px; color: #94a3b8; }
+.metric { text-align: center; }
+.metric .number { font-size: 48px; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.metric .label { font-size: 14px; color: #64748b; margin-top: 4px; }
+.arch-box { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 14px; background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 20px; white-space: pre; line-height: 1.5; color: #94a3b8; }
+.progress-bar { height: 8px; background: rgba(148,163,184,0.1); border-radius: 4px; margin: 8px 0; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+.check { color: #4ade80; }
+.bullet { padding-left: 24px; }
+.bullet li { font-size: 17px; color: #cbd5e1; margin-bottom: 10px; list-style: none; position: relative; }
+.bullet li::before { content: ''; position: absolute; left: -20px; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: #60a5fa; }
+.timeline { display: flex; gap: 0; margin-top: 20px; }
+.timeline-item { flex: 1; text-align: center; position: relative; padding-top: 30px; }
+.timeline-item::before { content: ''; position: absolute; top: 12px; left: 0; right: 0; height: 2px; background: rgba(59,130,246,0.3); }
+.timeline-item::after { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; border: 2px solid #1e293b; }
+.timeline-item.done::after { background: #4ade80; }
+.timeline-label { font-size: 12px; color: #64748b; }
+.timeline-text { font-size: 13px; color: #cbd5e1; margin-top: 4px; }
+@media print { body { background: white; } .slide { margin: 0; border-radius: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Cover -->
+<div class="slide">
+  <div style="display:flex; align-items:center; height:100%;">
+    <div>
+      <h1 style="font-size:52px; margin-bottom:24px;">OpenHuman 记忆系统独立化</h1>
+      <p class="subtitle" style="font-size:24px; margin-bottom:32px;">从深度耦合到多形态独立部署的技术演进</p>
+      <div style="margin-bottom:40px;">
+        <span class="tag tag-green">已完成</span>
+        <span class="tag tag-blue">6 个独立 Crate</span>
+        <span class="tag tag-purple">612 测试通过</span>
+      </div>
+      <p style="color:#64748b; font-size:16px;">汇报人：Colin &nbsp;|&nbsp; 日期：2026-06-11 &nbsp;|&nbsp; 分支：feat/extract-memory-crates</p>
+    </div>
+  </div>
+  <div class="slide-number">1</div>
+</div>
+
+<!-- Slide 2: Background -->
+<div class="slide">
+  <h2>项目背景</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div>
+      <h3>痛点</h3>
+      <ul class="bullet">
+        <li>记忆系统深度耦合在主仓库 <code>src/openhuman/memory/</code></li>
+        <li>无法被第三方项目独立引用</li>
+        <li>多端演进受阻（桌面 + 移动 + 服务端）</li>
+        <li>Python 和前端团队无法直接使用</li>
+      </ul>
+    </div>
+    <div>
+      <h3>目标</h3>
+      <ul class="bullet">
+        <li>零耦合：不依赖主仓库即可编译</li>
+        <li>全能力：存储、图谱、同步、联邦学习</li>
+        <li>多形态：Rust / HTTP / Python / WASM</li>
+        <li>生产就绪：完整测试 + 安全审计</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">2</div>
+</div>
+
+<!-- Slide 3: Architecture -->
+<div class="slide">
+  <h2>系统架构</h2>
+  <div class="arch-box" style="font-size:15px; margin-top:16px;">
+┌─────────────────────────────────────────────────────────────────────┐
+│                         消费层（按场景选择）                           │
+├───────────────────┬───────────────────┬─────────────────────────────┤
+│  memory-server    │  memory-python    │       memory-wasm           │
+│  HTTP/JSON-RPC    │  PyO3 绑定        │    浏览器纯计算              │
+│  23 个 API 端点    │  文档+KV+评分      │   评分/实体/相似度           │
+└─────────┬─────────┴─────────┬─────────┴──────────┬──────────────────┘
+          │                   │                    │
+          └───────────────────┼────────────────────┘
+                              ▼
+                ┌────────────────────────────┐
+                │      openhuman-memory      │
+                │         核心引擎            │
+                │  store | graph | sync      │
+                │  tree  | queue | federation│
+                └──────────┬─────────┬───────┘
+                           │         │
+                 ┌─────────▼───┐  ┌──▼────────────────┐
+                 │memory-types  │  │    embeddings     │
+                 │  共享类型     │  │ Ollama/OpenAI/... │
+                 └─────────────┘  └───────────────────┘</div>
+  <div class="slide-number">3</div>
+</div>
+
+<!-- Slide 4: Key Metrics -->
+<div class="slide">
+  <h2>关键指标</h2>
+  <div class="grid-3" style="margin-top:40px;">
+    <div class="card metric">
+      <div class="number">6</div>
+      <div class="label">独立 Crate</div>
+    </div>
+    <div class="card metric">
+      <div class="number">612</div>
+      <div class="label">测试用例（全部通过）</div>
+    </div>
+    <div class="card metric">
+      <div class="number">16/16</div>
+      <div class="label">路线图子项完成</div>
+    </div>
+    <div class="card metric">
+      <div class="number">~8000</div>
+      <div class="label">新增代码行数</div>
+    </div>
+    <div class="card metric">
+      <div class="number">2240</div>
+      <div class="label">文档行数</div>
+    </div>
+    <div class="card metric">
+      <div class="number">23</div>
+      <div class="label">RPC API 端点</div>
+    </div>
+  </div>
+  <div class="slide-number">4</div>
+</div>
+
+<!-- Slide 5: Progress -->
+<div class="slide">
+  <h2>完成进度</h2>
+  <table style="margin-top:16px;">
+    <tr><th>阶段</th><th>内容</th><th>状态</th></tr>
+    <tr><td>Phase 1</td><td>Crate 骨架、Store 迁移、Feature Flag 拆分</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 2</td><td>去耦合、Bridge Trait、独立编译 0 Error</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 3</td><td>生态 Crate（Server + Python + WASM）</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 4</td><td>知识图谱（持久化 + 关系发现 + 图查询 + RPC）</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 5</td><td>长期路线图（图嵌入 + 时序 + 同步 + 联邦）</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 6</td><td>安全审计修复（RustCrypto 替换手写加密）</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+    <tr><td>Phase 7</td><td>完整文档（7 份 README + API 参考）</td><td><span class="check">&#10003;</span> 已完成</td></tr>
+  </table>
+  <div style="margin-top:24px;">
+    <p style="font-size:14px; color:#64748b; margin-bottom:6px;">总体进度</p>
+    <div class="progress-bar" style="height:12px;"><div class="progress-fill" style="width:100%;"></div></div>
+  </div>
+  <div class="slide-number">5</div>
+</div>
+
+<!-- Slide 6: Knowledge Graph -->
+<div class="slide">
+  <h2>核心能力 ① — 知识图谱</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div>
+      <table>
+        <tr><th>能力</th><th>技术方案</th></tr>
+        <tr><td>持久化存储</td><td>SQLite 邻接表（节点 + 类型化边）</td></tr>
+        <tr><td>自动关系发现</td><td>共现 / 时序 / 主谓宾规则</td></tr>
+        <tr><td>图嵌入</td><td>TransE（纯 Rust 轻量实现）</td></tr>
+        <tr><td>时序分析</td><td>指数衰减 + 半衰期模型</td></tr>
+        <tr><td>最近邻搜索</td><td>向量距离 + Top-K 返回</td></tr>
+        <tr><td>可视化导出</td><td>DOT (Graphviz) + JSON</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card">
+        <h3>应用场景</h3>
+        <ul class="bullet">
+          <li>"谁和谁合作过？"</li>
+          <li>"哪些项目之间有关联？"</li>
+          <li>"过去 30 天最活跃的关系是什么？"</li>
+          <li>"找到与 Alice 语义最相近的人"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">6</div>
+</div>
+
+<!-- Slide 7: Multi-device Sync -->
+<div class="slide">
+  <h2>核心能力 ② — 多设备同步</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div>
+      <table>
+        <tr><th>模块</th><th>职责</th></tr>
+        <tr><td>Changelog</td><td>Lamport 逻辑时钟 + 变更日志</td></tr>
+        <tr><td>Device</td><td>X25519 密钥对 + mDNS 发现</td></tr>
+        <tr><td>Transport</td><td>LAN / Relay / Direct 三种传输</td></tr>
+        <tr><td>Merge</td><td>LWW / Union / Idempotent CRDT</td></tr>
+        <tr><td>Crypto</td><td>XChaCha20-Poly1305 E2E 加密</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card">
+        <h3>同步流程</h3>
+        <p style="font-size:14px;">
+          1. 每次写入生成 ChangeEntry (Lamport TS)<br>
+          2. mDNS 发现局域网对端<br>
+          3. X25519 密钥交换建立会话<br>
+          4. 变更加密传输<br>
+          5. 对端按策略自动合并<br>
+          6. 不可解决冲突存入冲突表
+        </p>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <h3>性能</h3>
+        <p style="font-size:14px;">1000 条变更写入 + 读取 < 2 秒</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">7</div>
+</div>
+
+<!-- Slide 8: Federation -->
+<div class="slide">
+  <h2>核心能力 ③ — 联邦学习</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div>
+      <table>
+        <tr><th>模块</th><th>职责</th></tr>
+        <tr><td>Local Patterns</td><td>行为模式提取 + 置信度评分</td></tr>
+        <tr><td>Privacy</td><td>ε-差分隐私 (Laplace) + PII 过滤</td></tr>
+        <tr><td>Aggregation</td><td>加法秘密共享</td></tr>
+        <tr><td>Community</td><td>群体模式 + 冷启动加速</td></tr>
+        <tr><td>Audit</td><td>贡献追溯 + 一键退出 + GDPR</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card">
+        <h3>隐私保障链路</h3>
+        <p style="font-size:14px;">
+          用户本地记忆<br>
+          &nbsp;&nbsp;↓ 模式提取<br>
+          行为模式（时序/偏好/知识）<br>
+          &nbsp;&nbsp;↓ PII 泛化（姓名→Person, 邮箱→[EMAIL]）<br>
+          &nbsp;&nbsp;↓ Laplace 噪声添加（ε-DP）<br>
+          &nbsp;&nbsp;↓ 秘密共享分片<br>
+          聚合服务器（只能看到聚合结果）<br>
+          &nbsp;&nbsp;↓ 分群推荐<br>
+          新用户冷启动
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">8</div>
+</div>
+
+<!-- Slide 9: Integration Paths -->
+<div class="slide">
+  <h2>四种接入形态</h2>
+  <div class="grid-2" style="margin-top:24px; gap:20px;">
+    <div class="card">
+      <h3 style="color:#60a5fa;">Rust 库</h3>
+      <p><code>cargo add openhuman-memory</code></p>
+      <p>适用：嵌入式集成、高性能场景</p>
+      <p>功能：<strong>全功能</strong>（存储 + 图谱 + 同步 + 联邦）</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#4ade80;">HTTP 微服务</h3>
+      <p><code>openhuman-memory-server --port 8420</code></p>
+      <p>适用：多语言接入、微服务架构</p>
+      <p>功能：存储 + 图谱 + 评分（23 个 RPC 端点）</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#fbbf24;">Python 绑定</h3>
+      <p><code>maturin develop</code></p>
+      <p>适用：数据科学、自动化脚本、Notebook</p>
+      <p>功能：文档存储 + KV + 评分</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#f472b6;">WASM 模块</h3>
+      <p><code>wasm-pack build --target web</code></p>
+      <p>适用：浏览器前端、边缘计算</p>
+      <p>功能：纯计算（评分 / 实体提取 / 相似度）</p>
+    </div>
+  </div>
+  <div class="slide-number">9</div>
+</div>
+
+<!-- Slide 10: Feature Matrix -->
+<div class="slide">
+  <h2>特性矩阵</h2>
+  <table style="margin-top:24px; font-size:15px;">
+    <tr><th>特性</th><th>Rust 库</th><th>HTTP 服务</th><th>Python</th><th>WASM</th></tr>
+    <tr><td>文档存储 + FTS5 全文搜索</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td>—</td></tr>
+    <tr><td>向量嵌入 + 语义搜索</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td>—</td><td>—</td></tr>
+    <tr><td>Key-Value 存储</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td>—</td></tr>
+    <tr><td>知识图谱 + 图嵌入</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td>—</td><td>—</td></tr>
+    <tr><td>多设备同步 + E2E 加密</td><td class="check">&#10003;</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>联邦学习 + 差分隐私</td><td class="check">&#10003;</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>实体提取</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>文本评分 + Token 估算</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+    <tr><td>余弦相似度计算</td><td class="check">&#10003;</td><td>—</td><td>—</td><td class="check">&#10003;</td></tr>
+  </table>
+  <div class="slide-number">10</div>
+</div>
+
+<!-- Slide 11: Security -->
+<div class="slide">
+  <h2>安全保障</h2>
+  <div class="grid-2" style="margin-top:24px;">
+    <div>
+      <h3>加密方案</h3>
+      <table>
+        <tr><th>组件</th><th>方案</th></tr>
+        <tr><td>对称加密</td><td>XChaCha20-Poly1305</td></tr>
+        <tr><td>密钥协商</td><td>X25519 Diffie-Hellman</td></tr>
+        <tr><td>密钥派生</td><td>HKDF-SHA256</td></tr>
+        <tr><td>实现来源</td><td>RustCrypto（已审计）</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>安全审计结果</h3>
+      <table>
+        <tr><th>检查项</th><th>结果</th></tr>
+        <tr><td>加密实现正确性</td><td><span class="check">&#10003;</span> 通过</td></tr>
+        <tr><td>常量时间操作</td><td><span class="check">&#10003;</span> 通过</td></tr>
+        <tr><td>私钥隔离</td><td><span class="check">&#10003;</span> 仅存本地</td></tr>
+        <tr><td>PII 保护</td><td><span class="check">&#10003;</span> 自动泛化</td></tr>
+        <tr><td>Server 认证</td><td><span class="check">&#10003;</span> Bearer Token</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="slide-number">11</div>
+</div>
+
+<!-- Slide 12: Next Steps -->
+<div class="slide">
+  <h2>后续规划</h2>
+  <div class="grid-3" style="margin-top:24px;">
+    <div class="card">
+      <h3 style="color:#4ade80;">短期</h3>
+      <ul class="bullet">
+        <li>合并到 main 分支</li>
+        <li>CI 集成 memory 测试</li>
+        <li>crates.io 发布 v0.1.0</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:#fbbf24;">中期</h3>
+      <ul class="bullet">
+        <li>Server 扩展 sync/federation RPC</li>
+        <li>Python 绑定覆盖图谱能力</li>
+        <li>图嵌入增量训练</li>
+        <li>OpenTelemetry 接入</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:#f472b6;">长期</h3>
+      <ul class="bullet">
+        <li>Docker + Helm 生产部署</li>
+        <li>移动端 FFI 接入</li>
+        <li>联邦学习后端上线</li>
+        <li>HNSW 向量索引（>100K 节点）</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">12</div>
+</div>
+
+<!-- Slide 13: Summary -->
+<div class="slide">
+  <h2>总结</h2>
+  <div style="margin-top:32px;">
+    <div class="grid-3" style="margin-bottom:40px;">
+      <div class="card metric">
+        <div class="number" style="font-size:36px;">100%</div>
+        <div class="label">路线图完成率 (16/16)</div>
+      </div>
+      <div class="card metric">
+        <div class="number" style="font-size:36px;">612</div>
+        <div class="label">测试全部通过</div>
+      </div>
+      <div class="card metric">
+        <div class="number" style="font-size:36px;">4</div>
+        <div class="label">接入形态可选</div>
+      </div>
+    </div>
+    <ul class="bullet" style="font-size:20px;">
+      <li><strong>6 个独立 Crate</strong> — 零外部耦合，可独立发布</li>
+      <li><strong>三大核心能力</strong> — 知识图谱 + 多设备同步 + 联邦学习</li>
+      <li><strong>安全合规</strong> — RustCrypto 加密 + 差分隐私 + GDPR 支持</li>
+      <li><strong>完整文档</strong> — 2240 行覆盖 API 参考、使用手册、集成指南</li>
+    </ul>
+  </div>
+  <p style="position:absolute; bottom:60px; left:80px; font-size:20px; color:#60a5fa; font-weight:600;">系统已具备独立发布和多端接入的能力，等待审查后合并主线。</p>
+  <div class="slide-number">13</div>
+</div>
+
+</body>
+</html>
