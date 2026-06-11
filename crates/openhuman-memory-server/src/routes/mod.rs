@@ -78,6 +78,11 @@ async fn dispatch(state: &AppState, method: &str, params: Value) -> Result<Value
         "memory.graph_nodes" => graph::handle_graph_nodes(state, params).await,
         "memory.graph_co_occurring" => graph::handle_graph_co_occurring(state, params).await,
         "memory.graph_discover" => graph::handle_graph_discover(state, params).await,
+        "memory.graph_train_embeddings" => graph::handle_graph_train_embeddings(state, params).await,
+        "memory.graph_nearest" => graph::handle_graph_nearest(state, params).await,
+        "memory.graph_active_edges" => graph::handle_graph_active_edges(state, params).await,
+        "memory.graph_decay" => graph::handle_graph_decay(state, params).await,
+        "memory.graph_export" => graph::handle_graph_export(state, params).await,
 
         other => Err(RpcError::method_not_found(other)),
     }

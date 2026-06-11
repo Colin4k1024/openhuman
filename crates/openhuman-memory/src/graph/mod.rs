@@ -13,8 +13,10 @@
 //!    — co-occurrence, temporal, and pattern-based rules.
 
 pub mod discovery;
+pub mod embedding;
 pub mod persistent_store;
 pub mod query;
+pub mod temporal;
 pub mod types;
 
 pub use discovery::{discover_and_persist, discover_co_occurrences, discover_pattern_relations};
@@ -22,7 +24,9 @@ pub use persistent_store::{
     delete_node, edges_from, edges_involving, get_node, increment_edge_weight, list_nodes,
     remove_edge, upsert_edge, upsert_node, EvidenceRef, GraphEdgePersistent, GraphNode,
 };
+pub use embedding::{nearest_nodes, train_embeddings, NodeEmbedding, SimilarNode, TrainResult, TransEConfig};
 pub use query::{co_occurring_entities, neighbors};
+pub use temporal::{apply_decay, export_dot, export_json, most_active_edges, node_activity, DecayConfig, DecayResult, GraphExport, TemporalEdge};
 pub use types::GraphEdge;
 
 #[cfg(test)]

@@ -8,6 +8,8 @@ use crate::AppState;
 
 use openhuman_memory::graph::{
     self, edges_from, edges_involving, get_node, list_nodes, upsert_node, GraphNode,
+    nearest_nodes, train_embeddings, TransEConfig,
+    apply_decay, export_dot, export_json, most_active_edges, DecayConfig,
 };
 
 #[derive(Deserialize)]
@@ -130,4 +132,123 @@ pub async fn handle_graph_discover(state: &AppState, params: Value) -> Result<Va
         .map_err(|e| RpcError::internal(&e.to_string()))?;
 
     Ok(json!({ "relations_discovered": count }))
+}
+
+// ─── Embedding endpoints ────────────────────────────────────────────────────
+
+#[derive(Deserialize)]
+struct TrainEmbeddingsParams {
+    #[serde(default = "default_dimension")]
+    dimension: usize,
+    #[serde(default = "default_epochs")]
+    epochs: usize,
+}
+
+fn default_dimension() -> usize { 64 }
+fn default_epochs() -> usize { 100 }
+
+/// memory.graph_train_embeddings — train TransE embeddings for all graph nodes.
+pub async fn handle_graph_train_embeddings(state: &AppState, params: Value) -> Result<Value, RpcError> {
+    let p: TrainEmbeddingsParams =
+        serde_json::from_value(params).map_err(|e| RpcError::invalid_params(&e.to_string()))?;
+
+    let tc = TransEConfig {
+        dimension: p.dimension,
+        epochs: p.epochs,
+        ..Default::default()
+    };
+    let result = train_embeddings(&state.config, &tc)
+        .map_err(|e| RpcError::internal(&e.to_string()))?;
+
+    Ok(json!(result))
+}
+
+#[derive(Deserialize)]
+struct NearestNodesParams {
+    node_id: String,
+    #[serde(default = "default_limit")]
+    limit: usize,
+}
+
+/// memory.graph_nearest — find most similar nodes by graph embedding.
+pub async fn handle_graph_nearest(state: &AppState, params: Value) -> Result<Value, RpcError> {
+    let p: NearestNodesParams =
+        serde_json::from_value(params).map_err(|e| RpcError::invalid_params(&e.to_string()))?;
+
+    let results = nearest_nodes(&state.config, &p.node_id, p.limit)
+        .map_err(|e| RpcError::internal(&e.to_string()))?;
+
+    Ok(json!(results))
+}
+
+// ─── Temporal endpoints ─────────────────────────────────────────────────────
+
+#[derive(Deserialize)]
+struct ActiveEdgesParams {
+    /// Days to look back (default: 30).
+    #[serde(default = "default_days")]
+    days: u64,
+    #[serde(default = "default_limit")]
+    limit: usize,
+}
+
+fn default_days() -> u64 { 30 }
+
+/// memory.graph_active_edges — most active edges in a time window.
+pub async fn handle_graph_active_edges(state: &AppState, params: Value) -> Result<Value, RpcError> {
+    let p: ActiveEdgesParams =
+        serde_json::from_value(params).map_err(|e| RpcError::invalid_params(&e.to_string()))?;
+
+    let since = chrono::Utc::now() - chrono::Duration::days(p.days as i64);
+    let edges = most_active_edges(&state.config, since, p.limit)
+        .map_err(|e| RpcError::internal(&e.to_string()))?;
+
+    Ok(json!(edges))
+}
+
+#[derive(Deserialize)]
+struct DecayParams {
+    #[serde(default = "default_half_life")]
+    half_life_days: f64,
+    #[serde(default = "default_min_weight")]
+    min_weight: f64,
+}
+
+fn default_half_life() -> f64 { 30.0 }
+fn default_min_weight() -> f64 { 0.1 }
+
+/// memory.graph_decay — apply temporal decay to edge weights.
+pub async fn handle_graph_decay(state: &AppState, params: Value) -> Result<Value, RpcError> {
+    let p: DecayParams =
+        serde_json::from_value(params).map_err(|e| RpcError::invalid_params(&e.to_string()))?;
+
+    let result = apply_decay(&state.config, &DecayConfig {
+        half_life_days: p.half_life_days,
+        min_weight: p.min_weight,
+    })
+    .map_err(|e| RpcError::internal(&e.to_string()))?;
+
+    Ok(json!(result))
+}
+
+#[derive(Deserialize)]
+struct ExportParams {
+    #[serde(default = "default_format")]
+    format: String,
+}
+
+fn default_format() -> String { "json".into() }
+
+/// memory.graph_export — export graph as DOT or JSON.
+pub async fn handle_graph_export(state: &AppState, params: Value) -> Result<Value, RpcError> {
+    let p: ExportParams =
+        serde_json::from_value(params).map_err(|e| RpcError::invalid_params(&e.to_string()))?;
+
+    let export = match p.format.as_str() {
+        "dot" => export_dot(&state.config),
+        _ => export_json(&state.config),
+    }
+    .map_err(|e| RpcError::internal(&e.to_string()))?;
+
+    Ok(json!(export))
 }

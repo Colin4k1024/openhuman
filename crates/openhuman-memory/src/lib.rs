@@ -22,7 +22,9 @@ pub mod tree;
 
 // Standalone modules — no external app dependencies.
 pub mod entities;
+pub mod federation;
 pub mod graph;
+pub mod sync_protocol;
 
 // Modules requiring orchestration, sync, or deep app integration.
 #[cfg(feature = "__full_app")]

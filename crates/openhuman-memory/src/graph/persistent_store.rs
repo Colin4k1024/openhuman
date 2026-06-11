@@ -85,6 +85,10 @@ pub struct EvidenceRef {
 // ─── Init ────────────────────────────────────────────────────────────────────
 
 /// Ensure graph tables exist. Called lazily on first graph operation.
+pub(crate) fn ensure_schema_inner(conn: &Connection) -> Result<()> {
+    ensure_schema(conn)
+}
+
 fn ensure_schema(conn: &Connection) -> Result<()> {
     conn.execute_batch(GRAPH_SCHEMA)
         .context("create graph schema")?;
