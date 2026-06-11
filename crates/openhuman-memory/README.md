@@ -388,6 +388,115 @@ cargo check
 cargo check --features __full_app  # (requires full app deps)
 ```
 
+## Knowledge Graph (`graph`)
+
+The graph module provides a persistent knowledge graph with derived and explicit relations.
+
+### Persistent Store
+
+```rust
+use openhuman_memory::graph::{upsert_node, upsert_edge, edges_from, GraphNode, GraphEdgePersistent};
+
+let node = GraphNode {
+    node_id: "person:alice".into(),
+    entity_type: "Person".into(),
+    label: "Alice".into(),
+    properties: serde_json::json!({"role": "engineer"}),
+    created_at: Utc::now(),
+    updated_at: Utc::now(),
+};
+upsert_node(&config, &node)?;
+```
+
+### Auto-Discovery
+
+```rust
+use openhuman_memory::graph::discover_and_persist;
+// Discovers co-occurrence, temporal, and pattern-based relations from chunks
+let count = discover_and_persist(&config, "chunk-1", "Alice works at Google", &entities, None)?;
+```
+
+### Graph Embeddings (TransE)
+
+```rust
+use openhuman_memory::graph::{train_embeddings, nearest_nodes, TransEConfig};
+
+let result = train_embeddings(&config, &TransEConfig { dimension: 64, epochs: 100, ..Default::default() })?;
+let similar = nearest_nodes(&config, "person:alice", 10)?;
+```
+
+### Temporal Graph
+
+```rust
+use openhuman_memory::graph::{most_active_edges, apply_decay, export_dot, DecayConfig};
+
+let active = most_active_edges(&config, Utc::now() - Duration::days(30), 20)?;
+let decay_result = apply_decay(&config, &DecayConfig::default())?;
+let dot_export = export_dot(&config)?;
+```
+
+## Sync Protocol (`sync_protocol`)
+
+Distributed memory synchronization primitives for multi-device scenarios.
+
+| Module | Purpose |
+|--------|---------|
+| `changelog` | Lamport-stamped change log for every mutation |
+| `device` | Per-device X25519 identity + mDNS discovery |
+| `transport` | `SyncTransport` trait (LAN/Relay/Direct) |
+| `merge` | CRDT conflict resolution (LWW, union, idempotent) |
+| `crypto` | XChaCha20-Poly1305 E2E encryption (via `chacha20poly1305` + `x25519-dalek`) |
+
+```rust
+use openhuman_memory::sync_protocol::changelog::{record_change, get_changes_since, ChangePayload, OpType};
+use openhuman_memory::sync_protocol::device::get_or_create_identity;
+use openhuman_memory::sync_protocol::crypto::{encrypt, decrypt, derive_session_key};
+
+// Record a change
+let entry = record_change(&config, "device-a", OpType::Insert, &ChangePayload {
+    store: "kv".into(), key: "greeting".into(), namespace: None, value: Some(json!("hello")),
+})?;
+
+// Pull changes for sync
+let changes = get_changes_since(&config, 0)?;
+
+// Encrypt for transit
+let key = derive_session_key(&shared_secret, b"session-1");
+let sealed = encrypt(&key, &serde_json::to_vec(&changes)?);
+```
+
+## Federation (`federation`)
+
+Cross-user pattern discovery with privacy preservation.
+
+| Module | Purpose |
+|--------|---------|
+| `local_patterns` | Extract behavioral patterns (temporal, preference, knowledge) |
+| `privacy` | ε-differential privacy, PII generalization, budget tracking |
+| `aggregation` | Additive secret sharing for secure aggregation |
+| `community` | Group patterns, cold-start profiles, user segmentation |
+| `audit` | Contribution tracking, opt-out, GDPR erasure |
+
+```rust
+use openhuman_memory::federation::local_patterns::{observe_pattern, PatternObservation, PatternType};
+use openhuman_memory::federation::privacy::{sanitize_patterns, PrivacyConfig};
+use openhuman_memory::federation::audit::{compliance_summary, gdpr_erase};
+
+// Observe a pattern
+observe_pattern(&config, &PatternObservation {
+    pattern_type: PatternType::Temporal,
+    trigger_context: "after standup".into(),
+    action_taken: "checks email".into(),
+    metadata: None,
+})?;
+
+// Sanitize for sharing (adds noise, strips PII)
+let sanitized = sanitize_patterns(&config, &patterns, &PrivacyConfig::default())?;
+
+// GDPR erasure
+let result = gdpr_erase(&config)?;
+```
+
 ## License
 
 MIT
