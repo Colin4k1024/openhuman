@@ -1,0 +1,163 @@
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="title" value="OpenHuman 开发流程 (Development Workflow)" style="text;html=1;fontSize=18;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="80" y="10" width="640" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- 开发者流程 -->
+    <mxCell id="dev-label" value="开发者工作流" style="text;fontSize=13;fontStyle=1;fontColor=#1565C0;" vertex="1" parent="1">
+      <mxGeometry x="20" y="50" width="150" height="25" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="d1" value="Fork &amp;&#xa;Clone" style="rounded=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="80" width="70" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2" value="git checkout -b&#xa;feat/xxx&#xa;upstream/main" style="rounded=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="120" y="80" width="100" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d3" value="编码&#xa;+ 单元测试&#xa;(TDD)" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="240" y="80" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d4" value="本地验证&#xa;typecheck&#xa;lint / fmt" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="340" y="80" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d5" value="Commit&#xa;(Conventional)" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="440" y="80" width="85" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d6" value="Push to&#xa;Fork (origin)" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="545" y="80" width="85" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d7" value="Open PR&#xa;→ upstream/main" style="rounded=1;fillColor=#90CAF9;strokeColor=#0D47A1;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="650" y="80" width="100" height="45" as="geometry"/>
+    </mxCell>
+
+    <!-- Arrows -->
+    <mxCell id="a1" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d1" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="a2" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d2" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="a3" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d3" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="a4" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d4" target="d5"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="a5" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d5" target="d6"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="a6" style="endArrow=classic;strokeColor=#1565C0;" edge="1" parent="1" source="d6" target="d7"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- CI Pipeline -->
+    <mxCell id="ci-label" value="CI 质量门禁 (PR 触发自动执行)" style="text;fontSize=13;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+      <mxGeometry x="20" y="150" width="280" height="25" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="ci-group" style="rounded=1;fillColor=#FFF3E0;strokeColor=#E65100;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="20" y="175" width="760" height="110" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="ci1" value="TypeCheck&#xa;tsc --noEmit" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="35" y="195" width="85" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci2" value="ESLint&#xa;+ Prettier" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="135" y="195" width="80" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci3" value="Rust fmt&#xa;+ check" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="230" y="195" width="80" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci4" value="Vitest&#xa;(前端覆盖率)" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="325" y="195" width="90" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci5" value="cargo test&#xa;(Rust 覆盖率)" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="430" y="195" width="90" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci6" value="diff-cover&#xa;≥80% 变更行" style="rounded=1;fillColor=#FF8A65;strokeColor=#D84315;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="535" y="195" width="95" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci7" value="PR Checklist&#xa;Guard" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="645" y="195" width="85" height="40" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="ci8" value="E2E Tests&#xa;(WDIO/Appium)" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="35" y="245" width="95" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci9" value="Desktop Build&#xa;(Win/Mac/Linux)" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="145" y="245" width="105" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci10" value="CEF Pin Guard" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="265" y="245" width="90" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="ci11" value="Coverage Matrix&#xa;Sync" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="370" y="245" width="100" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- Review & Merge -->
+    <mxCell id="review-label" value="Review &amp; Merge" style="text;fontSize=13;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+      <mxGeometry x="20" y="300" width="150" height="25" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="r1" value="CI 全部通过?" style="rhombus;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="50" y="330" width="110" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="r2" value="Code Review&#xa;(Maintainer)" style="rounded=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="220" y="340" width="100" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="r3" value="Approved?" style="rhombus;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="370" y="330" width="100" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="r4" value="Squash Merge&#xa;→ main" style="rounded=1;fillColor=#A5D6A7;strokeColor=#1B5E20;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="520" y="340" width="110" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="r-fail" value="修复后&#xa;重新推送" style="rounded=1;fillColor=#FFCDD2;strokeColor=#C62828;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="80" y="410" width="80" height="35" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="ra1" style="endArrow=classic;strokeColor=#2E7D32;" edge="1" parent="1" source="r1" target="r2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ra2" style="endArrow=classic;strokeColor=#2E7D32;" edge="1" parent="1" source="r2" target="r3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ra3" style="endArrow=classic;strokeColor=#2E7D32;" edge="1" parent="1" source="r3" target="r4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ra4" style="endArrow=classic;strokeColor=#C62828;dashed=1;" edge="1" parent="1" source="r1" target="r-fail"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ra4-label" value="No" style="text;fontSize=9;fontColor=#C62828;" vertex="1" parent="1">
+      <mxGeometry x="60" y="395" width="30" height="15" as="geometry"/>
+    </mxCell>
+    <mxCell id="ra1-label" value="Yes" style="text;fontSize=9;fontColor=#2E7D32;" vertex="1" parent="1">
+      <mxGeometry x="165" y="345" width="30" height="15" as="geometry"/>
+    </mxCell>
+
+    <!-- Release Pipeline -->
+    <mxCell id="rel-label" value="发布流程" style="text;fontSize=13;fontStyle=1;fontColor=#7B1FA2;" vertex="1" parent="1">
+      <mxGeometry x="20" y="465" width="100" height="25" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="rel1" value="main&#xa;(always releasable)" style="rounded=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="495" width="120" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="rel2" value="release-staging&#xa;(预发布)" style="rounded=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="180" y="495" width="110" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="rel3" value="deploy-smoke&#xa;(自动验证)" style="rounded=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="320" y="495" width="100" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="rel4" value="release-production&#xa;(正式发布)" style="rounded=1;fillColor=#CE93D8;strokeColor=#4A148C;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="450" y="495" width="120" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="rel5" value="installer-smoke&#xa;(安装包验证)" style="rounded=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="600" y="495" width="110" height="45" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="rla1" style="endArrow=classic;strokeColor=#7B1FA2;" edge="1" parent="1" source="rel1" target="rel2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="rla2" style="endArrow=classic;strokeColor=#7B1FA2;" edge="1" parent="1" source="rel2" target="rel3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="rla3" style="endArrow=classic;strokeColor=#7B1FA2;" edge="1" parent="1" source="rel3" target="rel4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="rla4" style="endArrow=classic;strokeColor=#7B1FA2;" edge="1" parent="1" source="rel4" target="rel5"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- 产出 -->
+    <mxCell id="out-label" value="交付产物" style="text;fontSize=13;fontStyle=1;fontColor=#333;" vertex="1" parent="1">
+      <mxGeometry x="20" y="560" width="100" height="25" as="geometry"/>
+    </mxCell>
+    <mxCell id="o1" value="Windows&#xa;.msi / .exe" style="rounded=1;fillColor=#ECEFF1;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="100" y="560" width="90" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="o2" value="macOS&#xa;.dmg" style="rounded=1;fillColor=#ECEFF1;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="210" y="560" width="80" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="o3" value="Linux&#xa;.AppImage / .deb" style="rounded=1;fillColor=#ECEFF1;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="310" y="560" width="105" height="40" as="geometry"/>
+    </mxCell>
+    <mxCell id="o4" value="Auto Update&#xa;(Tauri Updater)" style="rounded=1;fillColor=#ECEFF1;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="435" y="560" width="105" height="40" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

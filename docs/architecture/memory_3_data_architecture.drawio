@@ -1,0 +1,73 @@
+<mxGraphModel><root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+
+<!-- 标题 -->
+<mxCell id="title" value="OpenHuman 独立记忆系统 — 数据架构图" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=16;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1"><mxGeometry x="50" y="15" width="1000" height="40" as="geometry"/></mxCell>
+
+<!-- ===== 文档存储区 ===== -->
+<mxCell id="doc_bg" value="" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="65" width="460" height="320" as="geometry"/></mxCell>
+<mxCell id="doc_label" value="文档存储区 (Document Store)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#1a3a5c;" vertex="1" parent="1"><mxGeometry x="40" y="70" width="240" height="20" as="geometry"/></mxCell>
+
+<!-- documents 表 -->
+<mxCell id="documents" value="documents&#xa;─────────────────────&#xa;PK  id: TEXT (UUID)&#xa;    source: TEXT&#xa;    source_id: TEXT&#xa;    content: TEXT&#xa;    metadata: JSON&#xa;    created_at: INTEGER&#xa;    embedding: BLOB" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="100" width="200" height="175" as="geometry"/></mxCell>
+
+<!-- chunks 表 -->
+<mxCell id="chunks" value="chunks&#xa;─────────────────────&#xa;PK  id: TEXT (UUID)&#xa;FK  doc_id → documents&#xa;    content: TEXT&#xa;    token_count: INTEGER&#xa;    position: INTEGER&#xa;    embedding: BLOB&#xa;    score: REAL" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="270" y="100" width="200" height="175" as="geometry"/></mxCell>
+
+<!-- kv_store 表 -->
+<mxCell id="kv_store" value="kv_store&#xa;─────────────────────&#xa;PK  key: TEXT&#xa;    value: BLOB&#xa;    scope: TEXT&#xa;    updated_at: INTEGER&#xa;    ttl: INTEGER" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#1976d2;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="300" width="200" height="65" as="geometry"/></mxCell>
+
+<!-- fts5 虚表 -->
+<mxCell id="fts5" value="chunks_fts (FTS5)&#xa;─────────────────────&#xa;全文搜索虚表&#xa;对 chunks.content 建索引" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#1976d2;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="270" y="300" width="200" height="65" as="geometry"/></mxCell>
+
+<!-- ===== 图谱区 ===== -->
+<mxCell id="graph_bg" value="" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;opacity=40;" vertex="1" parent="1"><mxGeometry x="510" y="65" width="540" height="320" as="geometry"/></mxCell>
+<mxCell id="graph_label" value="知识图谱区 (Knowledge Graph)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#1a5c2a;" vertex="1" parent="1"><mxGeometry x="520" y="70" width="280" height="20" as="geometry"/></mxCell>
+
+<!-- entities 表 -->
+<mxCell id="entities" value="entities&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;    name: TEXT&#xa;    entity_type: TEXT&#xa;    confidence: REAL&#xa;    first_seen: INTEGER&#xa;    last_seen: INTEGER&#xa;    metadata: JSON" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="530" y="100" width="200" height="165" as="geometry"/></mxCell>
+
+<!-- entity_relations 表 -->
+<mxCell id="entity_relations" value="entity_relations&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;FK  from_entity → entities&#xa;FK  to_entity → entities&#xa;    relation_type: TEXT&#xa;    weight: REAL&#xa;    evidence: TEXT&#xa;    created_at: INTEGER" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="755" y="100" width="275" height="165" as="geometry"/></mxCell>
+
+<!-- graph_nodes 表 -->
+<mxCell id="graph_nodes" value="graph_nodes&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;    label: TEXT&#xa;    node_type: TEXT&#xa;    embedding: BLOB&#xa;    metadata: JSON&#xa;    created_at: INTEGER" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#388e3c;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="530" y="285" width="200" height="85" as="geometry"/></mxCell>
+
+<!-- graph_edges 表 -->
+<mxCell id="graph_edges" value="graph_edges&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;FK  from_node → graph_nodes&#xa;FK  to_node → graph_nodes&#xa;    edge_type: TEXT&#xa;    weight: REAL&#xa;    temporal_data: JSON" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#388e3c;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="755" y="285" width="275" height="95" as="geometry"/></mxCell>
+
+<!-- ===== 同步区 ===== -->
+<mxCell id="sync_bg" value="" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d6b656;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="410" width="460" height="200" as="geometry"/></mxCell>
+<mxCell id="sync_label" value="多设备同步区 (Sync)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#5c3a00;" vertex="1" parent="1"><mxGeometry x="40" y="415" width="240" height="20" as="geometry"/></mxCell>
+
+<!-- sync_changelog 表 -->
+<mxCell id="sync_changelog" value="sync_changelog&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;    device_id: TEXT&#xa;    lamport_clock: INTEGER&#xa;    operation: TEXT&#xa;    entity_id: TEXT&#xa;    data: BLOB (encrypted)&#xa;    synced: BOOLEAN" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#e65100;strokeColor=#bf360c;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="440" width="200" height="155" as="geometry"/></mxCell>
+
+<!-- device_registry 表 -->
+<mxCell id="device_registry" value="device_registry&#xa;─────────────────────&#xa;PK  device_id: TEXT&#xa;    public_key: BLOB&#xa;    display_name: TEXT&#xa;    capabilities: JSON&#xa;    last_seen: INTEGER" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#e65100;strokeColor=#bf360c;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="270" y="440" width="200" height="120" as="geometry"/></mxCell>
+
+<!-- ===== 联邦学习区 ===== -->
+<mxCell id="fed_bg" value="" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=40;" vertex="1" parent="1"><mxGeometry x="510" y="410" width="540" height="200" as="geometry"/></mxCell>
+<mxCell id="fed_label" value="联邦学习区 (Federation)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#3a0a5c;" vertex="1" parent="1"><mxGeometry x="520" y="415" width="240" height="20" as="geometry"/></mxCell>
+
+<!-- federation_patterns 表 -->
+<mxCell id="federation_patterns" value="federation_patterns&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;    pattern_type: TEXT&#xa;    content_hash: TEXT&#xa;    noised_score: REAL&#xa;    epsilon: REAL&#xa;    created_at: INTEGER&#xa;    shared: BOOLEAN" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#6a1b9a;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="530" y="440" width="230" height="155" as="geometry"/></mxCell>
+
+<!-- privacy_audit 表 -->
+<mxCell id="privacy_audit" value="privacy_audit&#xa;─────────────────────&#xa;PK  id: TEXT&#xa;    action: TEXT&#xa;    data_ref: TEXT&#xa;    gdpr_basis: TEXT&#xa;    erased_at: INTEGER" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#6a1b9a;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="790" y="440" width="230" height="120" as="geometry"/></mxCell>
+
+<!-- ===== 表关系连线 ===== -->
+<mxCell id="r1" value="1:N" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#1565c0;strokeWidth=2;endArrow=ERmany;startArrow=ERone;" edge="1" parent="1" source="documents" target="chunks"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="r2" value="1:N" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#2e7d32;strokeWidth=2;endArrow=ERmany;startArrow=ERone;" edge="1" parent="1" source="entities" target="entity_relations"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="r3" value="1:N" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#388e3c;strokeWidth=2;endArrow=ERmany;startArrow=ERone;" edge="1" parent="1" source="graph_nodes" target="graph_edges"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="r4" value="映射" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#ffd700;strokeWidth=1;dashed=1;" edge="1" parent="1" source="entities" target="graph_nodes"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="r5" value="FTS索引" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#1976d2;strokeWidth=1;dashed=1;" edge="1" parent="1" source="chunks" target="fts5"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+<!-- ===== 数据流标注 ===== -->
+<mxCell id="flow_write" value="① 写入流：文本 → documents → chunks → embedding向量" style="text;html=1;strokeColor=#1565c0;fillColor=#e8f4fd;rounded=1;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="30" y="635" width="460" height="30" as="geometry"/></mxCell>
+<mxCell id="flow_retrieve" value="② 检索流：向量查询 → chunks（余弦相似度召回）→ 排序输出" style="text;html=1;strokeColor=#2e7d32;fillColor=#e8f5e9;rounded=1;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="510" y="635" width="540" height="30" as="geometry"/></mxCell>
+<mxCell id="flow_sync" value="③ 同步流：本地写入 → sync_changelog（Lamport 时钟）→ XChaCha20 加密传输 → 对端 CRDT 合并" style="text;html=1;strokeColor=#e65100;fillColor=#fff3e0;rounded=1;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="30" y="675" width="700" height="30" as="geometry"/></mxCell>
+<mxCell id="flow_fed" value="④ 联邦流：本地模式 → Laplace 加噪 → 秘密共享 → 聚合" style="text;html=1;strokeColor=#6a1b9a;fillColor=#f3e5f5;rounded=1;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="750" y="675" width="300" height="30" as="geometry"/></mxCell>
+
+</root></mxGraphModel>

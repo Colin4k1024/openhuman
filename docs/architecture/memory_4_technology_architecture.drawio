@@ -1,0 +1,74 @@
+<mxGraphModel><root>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+
+<!-- 标题 -->
+<mxCell id="title" value="OpenHuman 独立记忆系统 — 技术架构图" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=16;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1"><mxGeometry x="50" y="15" width="960" height="40" as="geometry"/></mxCell>
+
+<!-- ===== 接口层 ===== -->
+<mxCell id="iface_bg" value="" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="65" width="980" height="130" as="geometry"/></mxCell>
+<mxCell id="iface_label" value="接口层 / 部署形态 (Interface Layer)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#1a5c2a;" vertex="1" parent="1"><mxGeometry x="40" y="70" width="300" height="20" as="geometry"/></mxCell>
+
+<mxCell id="rust_lib" value="Rust 原生库&#xa;───────────&#xa;函数调用 (zero-overhead)&#xa;Cargo.toml 依赖&#xa;最高性能" style="rounded=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="95" width="200" height="85" as="geometry"/></mxCell>
+<mxCell id="http_srv" value="HTTP / JSON-RPC 服务&#xa;───────────&#xa;Axum + tokio&#xa;REST + JSON-RPC 2.0&#xa;端口: 可配置" style="rounded=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="290" y="95" width="200" height="85" as="geometry"/></mxCell>
+<mxCell id="py_bind" value="Python 绑定&#xa;───────────&#xa;PyO3 + maturin&#xa;pip install&#xa;Python 3.8+" style="rounded=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="530" y="95" width="200" height="85" as="geometry"/></mxCell>
+<mxCell id="wasm_mod" value="WASM 模块&#xa;───────────&#xa;wasm-bindgen&#xa;wasm-pack build&#xa;浏览器 / Edge 节点" style="rounded=1;fillColor=#2e7d32;strokeColor=#1b5e20;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="770" y="95" width="200" height="85" as="geometry"/></mxCell>
+
+<!-- ===== 运行时层 ===== -->
+<mxCell id="rt_bg" value="" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="220" width="980" height="160" as="geometry"/></mxCell>
+<mxCell id="rt_label" value="运行时层 (Runtime Layer) — Rust + tokio" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#1a3a5c;" vertex="1" parent="1"><mxGeometry x="40" y="225" width="340" height="20" as="geometry"/></mxCell>
+
+<mxCell id="mem_engine" value="Memory Engine&#xa;store / tree / queue&#xa;entities / archivist&#xa;openhuman-memory 核心" style="rounded=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="255" width="190" height="100" as="geometry"/></mxCell>
+<mxCell id="vec_search" value="向量检索引擎&#xa;余弦相似度 (自研)&#xa;BLOB 向量存储&#xa;无外部向量 DB 依赖" style="rounded=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="260" y="255" width="190" height="100" as="geometry"/></mxCell>
+<mxCell id="graph_engine" value="图谱引擎&#xa;TransE 嵌入 (自研)&#xa;时序衰减模型&#xa;DOT / JSON 导出" style="rounded=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="470" y="255" width="190" height="100" as="geometry"/></mxCell>
+<mxCell id="privacy_engine" value="隐私计算引擎&#xa;Laplace ε-差分隐私&#xa;加法秘密共享&#xa;PII 过滤 + GDPR 擦除" style="rounded=1;fillColor=#1565c0;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="680" y="255" width="190" height="100" as="geometry"/></mxCell>
+<mxCell id="tokio_rt" value="tokio async runtime&#xa;任务调度 / 并发&#xa;broadcast 事件总线" style="rounded=1;fillColor=#0d47a1;strokeColor=#002171;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="880" y="255" width="110" height="100" as="geometry"/></mxCell>
+
+<!-- ===== 加密层 ===== -->
+<mxCell id="crypto_bg" value="" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="405" width="980" height="130" as="geometry"/></mxCell>
+<mxCell id="crypto_label" value="加密安全层 (Crypto &amp; Security Layer)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#6d1313;" vertex="1" parent="1"><mxGeometry x="40" y="410" width="340" height="20" as="geometry"/></mxCell>
+
+<mxCell id="chacha" value="XChaCha20-Poly1305&#xa;chacha20poly1305 crate&#xa;端到端加密传输&#xa;AEAD 认证加密" style="rounded=1;fillColor=#b71c1c;strokeColor=#7f0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="435" width="210" height="80" as="geometry"/></mxCell>
+<mxCell id="x25519" value="X25519 密钥协商&#xa;x25519-dalek crate&#xa;设备身份 · 每设备唯一密钥对&#xa;ECDH 共享密钥" style="rounded=1;fillColor=#b71c1c;strokeColor=#7f0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="280" y="435" width="210" height="80" as="geometry"/></mxCell>
+<mxCell id="hkdf" value="HKDF 密钥派生&#xa;会话密钥生成&#xa;双向握手协议" style="rounded=1;fillColor=#c62828;strokeColor=#7f0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="510" y="435" width="180" height="80" as="geometry"/></mxCell>
+<mxCell id="vault" value="Vault 密钥存储&#xa;密钥加密存储&#xa;零明文落盘" style="rounded=1;fillColor=#c62828;strokeColor=#7f0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="710" y="435" width="150" height="80" as="geometry"/></mxCell>
+<mxCell id="sha2" value="SHA-2 (sha2 crate)&#xa;内容哈希 · 去重&#xa;完整性校验" style="rounded=1;fillColor=#c62828;strokeColor=#7f0000;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="880" y="435" width="110" height="80" as="geometry"/></mxCell>
+
+<!-- ===== 存储层 ===== -->
+<mxCell id="store_bg" value="" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d6b656;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="560" width="980" height="120" as="geometry"/></mxCell>
+<mxCell id="store_label" value="存储层 (Storage Layer)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#5c3a00;" vertex="1" parent="1"><mxGeometry x="40" y="565" width="240" height="20" as="geometry"/></mxCell>
+
+<mxCell id="sqlite" value="SQLite + rusqlite&#xa;零服务依赖&#xa;文档/chunk/向量/KV/实体/图谱/同步" style="rounded=1;fillColor=#e65100;strokeColor=#bf360c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="590" width="300" height="70" as="geometry"/></mxCell>
+<mxCell id="fts_store" value="SQLite FTS5&#xa;全文搜索索引&#xa;content: chunks.content" style="rounded=1;fillColor=#ef6c00;strokeColor=#bf360c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="370" y="590" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="blob_vec" value="BLOB 向量存储&#xa;余弦相似度计算&#xa;无外部向量数据库" style="rounded=1;fillColor=#ef6c00;strokeColor=#bf360c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="590" y="590" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="memory_tree" value="Memory Tree&#xa;摘要树分层存储&#xa;递归摘要压缩" style="rounded=1;fillColor=#f57c00;strokeColor=#e65100;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="810" y="590" width="180" height="70" as="geometry"/></mxCell>
+
+<!-- ===== 网络层 ===== -->
+<mxCell id="net_bg" value="" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=40;" vertex="1" parent="1"><mxGeometry x="30" y="705" width="980" height="120" as="geometry"/></mxCell>
+<mxCell id="net_label" value="网络层 (Network Layer)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#3a0a5c;" vertex="1" parent="1"><mxGeometry x="40" y="710" width="240" height="20" as="geometry"/></mxCell>
+
+<mxCell id="mdns" value="mDNS 局域网发现&#xa;_openhuman-memory._tcp&#xa;零配置 P2P 发现" style="rounded=1;fillColor=#6a1b9a;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="735" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="socketio" value="Socket.io 云中继&#xa;E2E 加密隧道&#xa;NAT 穿透支持" style="rounded=1;fillColor=#6a1b9a;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="270" y="735" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="lan_http" value="LAN HTTP Transport&#xa;直连传输&#xa;同局域网高速同步" style="rounded=1;fillColor=#7b1fa2;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="490" y="735" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="cloud_http" value="Cloud HTTP 回退&#xa;跨网络兜底&#xa;后端 API 代理" style="rounded=1;fillColor=#7b1fa2;strokeColor=#4a148c;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="710" y="735" width="200" height="70" as="geometry"/></mxCell>
+<mxCell id="axum" value="Axum HTTP Server&#xa;tokio-based&#xa;可选 TLS" style="rounded=1;fillColor=#4a148c;strokeColor=#311b92;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="920" y="735" width="70" height="70" as="geometry"/></mxCell>
+
+<!-- ===== 外部向量提供商 ===== -->
+<mxCell id="ext_bg" value="" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;opacity=40;dashed=1;" vertex="1" parent="1"><mxGeometry x="30" y="850" width="980" height="100" as="geometry"/></mxCell>
+<mxCell id="ext_label" value="外部向量提供商 (External Embedding Providers)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="855" width="400" height="20" as="geometry"/></mxCell>
+
+<mxCell id="openai" value="OpenAI&#xa;text-embedding-3" style="rounded=1;fillColor=#9e9e9e;strokeColor=#616161;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="880" width="155" height="55" as="geometry"/></mxCell>
+<parameter name="content">
+<mxCell id="cohere" value="Cohere&#xa;embed-v3" style="rounded=1;fillColor=#9e9e9e;strokeColor=#616161;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="225" y="880" width="155" height="55" as="geometry"/></mxCell>
+<mxCell id="ollama" value="Ollama (本地)&#xa;nomic-embed-text" style="rounded=1;fillColor=#757575;strokeColor=#424242;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="400" y="880" width="155" height="55" as="geometry"/></mxCell>
+<mxCell id="voyage" value="Voyage AI&#xa;voyage-2" style="rounded=1;fillColor=#9e9e9e;strokeColor=#616161;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="575" y="880" width="155" height="55" as="geometry"/></mxCell>
+<mxCell id="custom_prov" value="Custom Provider&#xa;EmbeddingProvider trait&#xa;可扩展接口" style="rounded=1;fillColor=#757575;strokeColor=#424242;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1"><mxGeometry x="750" y="880" width="240" height="55" as="geometry"/></mxCell>
+
+<!-- ===== 层间箭头 ===== -->
+<mxCell id="a1" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#444;strokeWidth=1.5;" edge="1" parent="1" source="iface_bg" target="rt_bg"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="a2" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#444;strokeWidth=1.5;" edge="1" parent="1" source="rt_bg" target="crypto_bg"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="a3" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#444;strokeWidth=1.5;" edge="1" parent="1" source="rt_bg" target="store_bg"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="a4" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#444;strokeWidth=1.5;" edge="1" parent="1" source="crypto_bg" target="net_bg"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="a5" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666;strokeWidth=1;dashed=1;" edge="1" parent="1" source="vec_search" target="ext_bg"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+</root></mxGraphModel>

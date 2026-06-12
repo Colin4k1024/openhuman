@@ -1,0 +1,127 @@
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="title" value="OpenHuman 应用架构 (Application Architecture)" style="text;html=1;fontSize=18;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="100" y="10" width="600" height="35" as="geometry"/>
+    </mxCell>
+    
+    <!-- 前端层 -->
+    <mxCell id="fe-group" value="前端表示层 — React + Vite + Redux Toolkit" style="rounded=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontStyle=1;fontSize=12;verticalAlign=top;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="55" width="760" height="130" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe1" value="Pages&#xa;━━━━━&#xa;Home / Chat&#xa;Intelligence&#xa;Channels&#xa;Settings" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="35" y="80" width="95" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe2" value="Redux Store&#xa;━━━━━━━&#xa;chatRuntime&#xa;accounts&#xa;socket&#xa;thread&#xa;coreMode" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="145" y="80" width="95" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe3" value="Services&#xa;━━━━━━━&#xa;coreRpcClient&#xa;socketService&#xa;apiClient&#xa;analytics&#xa;chatService" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="255" y="80" width="100" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe4" value="Lib&#xa;━━━━━━━&#xa;MCP Client&#xa;AI Config&#xa;Tunnel Crypto&#xa;i18n (12 locales)" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="370" y="80" width="110" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe5" value="Components&#xa;━━━━━━━━━&#xa;Chat / Thread&#xa;Approval Card&#xa;Provider Surface&#xa;iOS (实验)" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="495" y="80" width="110" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe6" value="Provider Chain&#xa;━━━━━━━━━━━&#xa;ErrorBoundary&#xa;→ Redux&#xa;→ CoreState&#xa;→ Socket&#xa;→ ChatRuntime" style="rounded=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="620" y="80" width="110" height="90" as="geometry"/>
+    </mxCell>
+
+    <!-- IPC 通道 -->
+    <mxCell id="ipc-bar" value="Tauri IPC (invoke → core_rpc_relay) + Socket.io 实时通道" style="rounded=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="195" width="760" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- Tauri Shell 层 -->
+    <mxCell id="tauri-group" value="Tauri Shell 层 — Rust 桌面宿主 (CEF Runtime)" style="rounded=1;fillColor=#FFF3E0;strokeColor=#E65100;fontStyle=1;fontSize=12;verticalAlign=top;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="235" width="760" height="110" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts1" value="CoreProcessHandle&#xa;(in-process tokio task&#xa;+ Bearer Auth)" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=center;" vertex="1" parent="1">
+      <mxGeometry x="35" y="262" width="140" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts2" value="CEF Webview&#xa;(Provider 嵌入)&#xa;WhatsApp/Telegram/&#xa;Slack/Discord..." style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=center;" vertex="1" parent="1">
+      <mxGeometry x="190" y="262" width="130" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts3" value="CDP Scanner&#xa;(per-provider)&#xa;消息抓取/注入&#xa;无 JS 注入" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=center;" vertex="1" parent="1">
+      <mxGeometry x="335" y="262" width="120" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts4" value="Native Modules&#xa;━━━━━━━━━━&#xa;meet_audio/video&#xa;fake_camera&#xa;screen_capture&#xa;dictation_hotkeys" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="470" y="262" width="130" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts5" value="Window &amp; Lifecycle&#xa;━━━━━━━━━━━━&#xa;window_state&#xa;process_recovery&#xa;deep_link&#xa;notifications" style="rounded=1;fillColor=#FFE0B2;strokeColor=#EF6C00;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+      <mxGeometry x="615" y="262" width="130" height="65" as="geometry"/>
+    </mxCell>
+
+    <!-- JSON-RPC -->
+    <mxCell id="rpc-bar" value="JSON-RPC (HTTP 127.0.0.1:port/rpc, Bearer Token)" style="rounded=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="355" width="760" height="30" as="geometry"/>
+    </mxCell>
+
+    <!-- Rust Core 层 -->
+    <mxCell id="core-group" value="Rust Core 层 — openhuman crate (60+ 领域模块)" style="rounded=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontStyle=1;fontSize=12;verticalAlign=top;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="395" width="760" height="200" as="geometry"/>
+    </mxCell>
+    
+    <!-- Transport -->
+    <mxCell id="transport" value="src/core/ — Transport &amp; Dispatch" style="rounded=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontStyle=1;fontSize=10;verticalAlign=top;align=center;" vertex="1" parent="1">
+      <mxGeometry x="35" y="420" width="730" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr1" value="Axum HTTP" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="45" y="438" width="75" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr2" value="JSON-RPC Dispatch" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="130" y="438" width="110" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr3" value="CLI (clap)" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="250" y="438" width="70" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr4" value="Socket.io" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="330" y="438" width="70" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr5" value="Auth (Bearer)" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="410" y="438" width="80" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr6" value="EventBus (pub/sub)" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="500" y="438" width="110" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="tr7" value="Observability" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="620" y="438" width="80" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- Domain modules -->
+    <mxCell id="domains" value="src/openhuman/ — Domain Modules (Controller Registry Pattern)" style="rounded=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontStyle=1;fontSize=10;verticalAlign=top;align=center;" vertex="1" parent="1">
+      <mxGeometry x="35" y="475" width="730" height="110" as="geometry"/>
+    </mxCell>
+    <mxCell id="d1" value="agent&#xa;threads&#xa;context" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="45" y="497" width="70" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2" value="memory*&#xa;(graph/store&#xa;/tree/sync)" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="125" y="497" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d3" value="channels&#xa;providers&#xa;webview_*" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="215" y="497" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d4" value="tools&#xa;tool_registry&#xa;skills" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="305" y="497" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d5" value="meet&#xa;meet_agent&#xa;voice" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="395" y="497" width="75" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d6" value="security&#xa;approval&#xa;encryption" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="480" y="497" width="80" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d7" value="cron&#xa;webhooks&#xa;notifications" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="570" y="497" width="85" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="d8" value="billing&#xa;wallet&#xa;config" style="rounded=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=9;" vertex="1" parent="1">
+      <mxGeometry x="665" y="497" width="70" height="45" as="geometry"/>
+    </mxCell>
+    
+    <!-- 补充说明 -->
+    <mxCell id="note1" value="特点: Core 作为 in-process tokio task 运行在 Tauri Shell 内，无 sidecar 二进制。&#xa;前端通过 invoke('core_rpc_relay') 透传 JSON-RPC 调用，避免 CORS。" style="text;fontSize=10;align=left;fontColor=#555;" vertex="1" parent="1">
+      <mxGeometry x="35" y="555" width="600" height="35" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>
